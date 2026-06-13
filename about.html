@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - Invincible Studio</title>
+    <style>
+        /* --- NETFLIX SYSTEM PREMIUM CUSTOM THEME PALETTES --- */
+        :root {
+            --bg-color: #141414;
+            --card-bg: #1f1f1f;
+            --card-hover: #262626;
+            --accent-red: #E50914;
+            --accent-glow: rgba(229, 9, 20, 0.35);
+            --text-color: #F5F5F7;
+            --text-muted: #9c9c9c;
+            --border-color: #333333;
+            --input-bg: #2b2b2b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navbar Layout Alignment */
+        .navbar {
+            background-color: #000000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 4%;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 2px solid var(--accent-red);
+        }
+
+        .navbar-brand img {
+            height: 35px;
+            vertical-align: middle;
+        }
+
+        .navbar-nav {
+            list-style: none;
+            display: flex;
+            gap: 25px;
+        }
+
+        .navbar-nav a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .navbar-nav a:hover, .navbar-nav a.active {
+            color: var(--accent-red);
+        }
+
+        /* Cinematic Profile Hero Header Panel */
+        .about-hero {
+            width: 100%;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(20,20,20,1) 100%), url('muthukumar.png') no-repeat center 20%;
+            background-size: cover;
+            position: relative;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .hero-overlay-curtain {
+            background: radial-gradient(circle at center, rgba(61, 3, 6, 0.45) 0%, rgba(0, 0, 0, 0.85) 100%);
+            padding: 90px 4%;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .hero-profile-wrapper {
+            max-width: 800px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* INCREASED PROFILE AVATAR SIZING */
+        .profile-avatar {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--accent-red);
+            margin-bottom: 24px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.85), 0 0 25px var(--accent-glow);
+        }
+
+        .profile-name {
+            font-size: 40px;
+            font-weight: 900;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+            text-shadow: 0 4px 12px rgba(0,0,0,0.9);
+        }
+
+        .profile-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--accent-red);
+            letter-spacing: 5px;
+            margin-bottom: 14px;
+        }
+
+        .profile-tagline {
+            font-size: 15px;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        /* Central Workspace Main Containers */
+        .about-main-wrapper {
+            max-width: 1100px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 40px 4%;
+            display: flex;
+            flex-direction: column;
+            gap: 35px;
+        }
+
+        /* Philosophy Section Card */
+        .about-statement-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--accent-red);
+            padding: 30px;
+            border-radius: 4px;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        .about-statement-card p:first-child { margin-bottom: 15px; font-weight: 600; color: #ffffff;}
+        .about-statement-card p:last-child { color: var(--text-muted); }
+
+        /* Details Background Information Triple Grid */
+        .details-triple-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .details-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .details-card-header {
+            background: #000000;
+            padding: 12px 18px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #ffffff;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .details-card-content {
+            padding: 20px;
+            flex-grow: 1;
+        }
+
+        .static-highlight-text {
+            font-size: 16px;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .bullet-manifest {
+            list-style: none;
+            font-size: 13.5px;
+            color: var(--text-muted);
+        }
+        .bullet-manifest li {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: flex-start;
+        }
+        .bullet-manifest li::before {
+            content: "▪";
+            color: var(--accent-red);
+            margin-right: 10px;
+        }
+        .bullet-manifest li:last-child { margin-bottom: 0; }
+
+        /* The Narrative Journey Strip Layout */
+        .narrative-journey-strip {
+            background: linear-gradient(135deg, #1f1f1f 0%, #0d0d0d 100%);
+            border: 1px solid var(--border-color);
+            padding: 35px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .narrative-journey-strip h3 {
+            font-size: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+            color: var(--accent-red);
+        }
+        .narrative-journey-strip p {
+            font-size: 14.5px;
+            line-height: 1.5;
+            color: var(--text-muted);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Master Filmography Segment List Rows Cards */
+        .filmography-container h3, .accolades-panel-card h3, .contact-terminal-footer h3 {
+            font-size: 15px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 18px;
+            color: #ffffff;
+            border-left: 3px solid var(--accent-red);
+            padding-left: 10px;
+        }
+
+        .film-row-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            display: flex;
+            gap: 35px;
+            padding: 30px;
+            margin-bottom: 25px;
+            align-items: center;
+            transition: border-color 0.2s, background-color 0.2s;
+        }
+        .film-row-card:last-child { margin-bottom: 0; }
+        .film-row-card:hover { border-color: var(--accent-red); background-color: var(--card-hover); }
+
+        /* INCREASED POSTER DIMENSIONS & GRAPHIC TREATMENT */
+        .film-poster {
+            width: 400px;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+            flex-shrink: 0;
+        }
+
+        .film-text-meta {
+            flex-grow: 1;
+        }
+        
+        .film-text-meta h4 a {
+            font-size: 21px;
+            font-weight: 800;
+            color: #ffffff;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        
+        .film-text-meta h4 a:hover {
+            color: var(--accent-red);
+        }
+
+        .film-genre-badge-row {
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: bold;
+            color: var(--accent-red);
+            letter-spacing: 0.5px;
+            margin-bottom: 14px;
+            margin-top: 4px;
+        }
+        .film-synopsis-text {
+            font-size: 14px;
+            line-height: 1.55;
+            color: var(--text-muted);
+            text-align: justify;
+        }
+
+        /* Accolades Awards Grid Panel */
+        .accolades-panel-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 30px;
+            border-radius: 4px;
+        }
+
+        .accolades-grid {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 15px;
+        }
+        .accolades-grid li {
+            font-size: 14px;
+            font-weight: bold;
+            color: #ffffff;
+            background: #161616;
+            padding: 12px 16px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Contact Foot Execution Terminal */
+        .contact-terminal-footer {
+            background: #000000;
+            border: 1px solid var(--border-color);
+            padding: 35px;
+            border-radius: 4px;
+        }
+
+        .contact-links-layout {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px 50px;
+            margin-top: 5px;
+        }
+
+        .contact-link-node {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .node-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            font-weight: bold;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+        }
+        .node-value {
+            font-size: 15px;
+            font-weight: bold;
+            color: #ffffff;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .node-value:hover {
+            color: var(--accent-red);
+        }
+
+        /* Responsive Adaptive Breaking Points Handles */
+        @media (max-width: 768px) {
+            .film-row-card {
+                flex-direction: column;
+                text-align: center;
+                gap: 20px;
+                padding: 20px;
+            }
+            .film-synopsis-text {
+                text-align: center;
+            }
+            .contact-links-layout {
+                flex-direction: column;
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a class="navbar-brand" href="index.html">
+            <img src="Invinc.png" alt="Invincible Studio Logo">
+        </a>
+        <ul class="navbar-nav">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html" class="active">About</a></li>
+            <li><a href="pre.html">Pre-Production</a></li>
+            <li><a href="production.html">Production</a></li>
+            <li><a href="post.html">Post-Production</a></li>
+        </ul>
+    </nav>
+
+    <header class="about-hero">
+        <div class="hero-overlay-curtain">
+            <div class="hero-profile-wrapper">
+                <img src="muthukumar.png" alt="Muthukumar Nadar" class="profile-avatar">
+                <h1 class="profile-name">MUTHUKUMAR NADAR</h1>
+                <h2 class="profile-title">FILM MAKER</h2>
+                <p class="profile-tagline">Dreamer Making Dreams</p>
+            </div>
+        </div>
+    </header>
+
+    <main class="about-main-wrapper">
+        
+        <section class="about-statement-card">
+            <p>Every story starts from a dream. Dreams become ideas which further shape into concepts. When dream, idea and concepts align, it becomes art that expresses vision and emotion.</p>
+            <p>I am Muthukumar Nadar, creating films that narrate dreams, ideas and artistic expression.</p>
+        </section>
+
+        <section class="details-triple-grid">
+            <div class="details-card">
+                <div class="details-card-header"><span>📅</span> Date of Birth</div>
+                <div class="details-card-content">
+                    <p class="static-highlight-text">29 August 1996</p>
+                </div>
+            </div>
+
+            <div class="details-card">
+                <div class="details-card-header"><span>💻</span> Technical Skills</div>
+                <div class="details-card-content">
+                    <ul class="bullet-manifest">
+                        <li>DaVinci Resolve, Premiere Pro, Shotcut</li>
+                        <li>Blender, Medibang Paint</li>
+                        <li>Adobe Animate</li>
+                        <li>Sketching & Drafting</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="details-card">
+                <div class="details-card-header"><span>🎬</span> Experience</div>
+                <div class="details-card-content">
+                    <ul class="bullet-manifest">
+                        <li>Script Writing & Storyboarding</li>
+                        <li>Direction & Cinematography</li>
+                        <li>Production Management</li>
+                        <li>Editing & Post Production</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="narrative-journey-strip">
+            <h3>Journey</h3>
+            <p>My journey began in 2018 when I started making films with friends. Since then, passionate artists have collaborated to create meaningful cinema.</p>
+        </section>
+
+        <section class="filmography-container">
+            <h3>Filmography</h3>
+
+            <div class="film-row-card">
+                <img src="Incomplete.jpg" alt="Incomplete (2023)" class="film-poster">
+                <div class="film-text-meta">
+                    <h4><a href="https://drive.google.com/file/d/1kOIJ6lcszKFOzIZF4oeXvab_UdyScw23/view?fbclid=PAb21jcASakCtleHRuA2FlbQIxMQBzcnRjBmFwcF9pZA81NjcwNjczNDMzNTI0MjcAAacElOQz7iTUa1-8t_hyZj8h8kaSrV9ynjEddxz1OyjkaIwAoF2hXSgkHT_HyA_aem_FTI2QDX9AydWF3odNTo96Q&pli=1&utm_source=ig&utm_medium=social&utm_content=link_in_bio" target="_blank">INCOMPLETE (2023)</a></h4>
+                    <div class="film-genre-badge-row">Psychological Horror &nbsp;|&nbsp; 18m 55s</div>
+                    <p class="film-synopsis-text">A man struggles with guilt and reality after committing a crime, leading to mysterious events.</p>
+                </div>
+            </div>
+
+            <div class="film-row-card">
+                <img src="ROSES IN PAIN.jpg" alt="Roses in Pain (2023)" class="film-poster">
+                <div class="film-text-meta">
+                    <h4><a href="https://drive.google.com/file/d/13mXpvy5ZTQWy1yVCy_mHuMYmrtAaRyZ8/view?fbclid=PAb21jcASakERleHRuA2FlbQIxMQBzcnRjBmFwcF9pZA81NjcwNjczNDMzNTI0MjcAAaf31Bk_wMklVZZqZI5G_yR0nySaYaCZhpdcZXiIpzmCy6vJYWEF0mYyJrefVg_aem_xh2H2NAdqrMQlJrRHcorlw&utm_source=ig&utm_medium=social&utm_content=link_in_bio" target="_blank">ROSES IN PAIN (2023)</a></h4>
+                    <div class="film-genre-badge-row">Psychological Fantasy &nbsp;|&nbsp; 13m 13s</div>
+                    <p class="film-synopsis-text">A surreal story exploring identity and consequences through supernatural experiences.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="accolades-panel-card">
+            <h3>Awards & Recognition</h3>
+            <ul class="accolades-grid">
+                <li><span>🏆</span> ISCFF Winner</li>
+                <li><span>🏆</span> ICFF Season 7 Winner</li>
+                <li><span>🏆</span> Cinemascope Winner</li>
+                <li><span>🏆</span> GISFFA Winner</li>
+                <li><span>🏆</span> International Diamond Film Festival Winner</li>
+            </ul>
+        </section>
+
+        <footer class="contact-terminal-footer">
+            <h3>Contact & Connection</h3>
+            <div class="contact-links-layout">
+                <div class="contact-link-node">
+                    <span class="node-label">Phone:</span>
+                    <a href="tel:+918879794267" class="node-value">+91 8369089958</a>
+                </div>
+                <div class="contact-link-node">
+                    <span class="node-label">Email:</span>
+                    <a href="mailto:muthukumarnadar0@gmail.com" class="node-value">muthukumarnadar0@gmail.com</a>
+                </div>
+                <div class="contact-link-node">
+                    <span class="node-label">Instagram:</span>
+                    <a href="https://instagram.com/i.maybe.mad" target="_blank" class="node-value">@i.maybe.mad</a>
+                </div>
+            </div>
+        </footer>
+
+    </main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            console.log("Invincible Creative Biography Dossier Matrix System... Loaded.");
+
+            // Implement a fluid visual scaling feedback loop over the interactive poster elements arrays
+            const filmRows = document.querySelectorAll(".film-row-card");
+            
+            filmRows.forEach(row => {
+                row.addEventListener("mouseenter", () => {
+                    const posterImg = row.querySelector(".film-poster");
+                    if (posterImg) {
+                        posterImg.style.transform = "scale(1.05) translateY(-2px)";
+                        posterImg.style.boxShadow = "0 15px 30px rgba(0,0,0,0.85)";
+                        posterImg.style.transition = "transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.3s ease";
+                    }
+                });
+
+                row.addEventListener("mouseleave", () => {
+                    const posterImg = row.querySelector(".film-poster");
+                    if (posterImg) {
+                        posterImg.style.transform = "scale(1) translateY(0)";
+                        posterImg.style.boxShadow = "0 10px 25px rgba(0,0,0,0.6)";
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

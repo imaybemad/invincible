@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invincible Studio - Official Crew List</title>
+    <style>
+        /* --- NETFLIX DARK THEME UI STYLES --- */
+        :root {
+            --bg-color: #141414;
+            --card-bg: #1f1f1f;
+            --accent-red: #E50914;
+            --text-color: #F5F5F7;
+            --text-muted: #808080;
+            --border-color: #333333;
+            --input-bg: #2b2b2b;
+            --header-blue: #154360;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding-bottom: 60px;
+        }
+
+        /* Navbar */
+        .navbar {
+            background-color: #000000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 4%;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 2px solid var(--accent-red);
+        }
+
+        .navbar-brand img {
+            height: 35px;
+            vertical-align: middle;
+        }
+
+        .navbar-nav {
+            list-style: none;
+            display: flex;
+            gap: 25px;
+        }
+
+        .navbar-nav a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .navbar-nav a:hover {
+            color: var(--accent-red);
+        }
+
+        /* Workspace Toolbar Controls */
+        .manager-bar {
+            max-width: 1200px;
+            margin: 20px auto;
+            background: var(--card-bg);
+            padding: 15px 20px;
+            border-radius: 6px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid var(--border-color);
+        }
+
+        .manager-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .manager-bar label {
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--text-muted);
+        }
+
+        select, input[type="text"].nav-input {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 8px 12px;
+            border-radius: 4px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        button {
+            background-color: var(--accent-red);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        button:hover {
+            background-color: #b80710;
+        }
+        
+        button:active {
+            transform: scale(0.98);
+        }
+
+        button.btn-secondary {
+            background-color: #444;
+        }
+        button.btn-secondary:hover {
+            background-color: #555;
+        }
+
+        /* --- CREW WORKSPACE DOCUMENT --- */
+        .document-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            color: var(--text-color);
+            padding: 40px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Title banner from 1000054400.png */
+        .doc-main-title {
+            color: var(--accent-red);
+            font-size: 22px;
+            font-weight: 800;
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .doc-main-title input {
+            color: var(--text-color);
+            font-size: 22px;
+            font-weight: 800;
+            text-transform: uppercase;
+            width: 100%;
+            border: none;
+            background: transparent;
+            outline: none;
+        }
+
+        /* Section Banner Dividers */
+        .section-header-banner {
+            background-color: var(--header-blue);
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 800;
+            text-transform: uppercase;
+            padding: 6px 12px;
+            margin-top: 25px;
+            margin-bottom: 10px;
+            letter-spacing: 0.5px;
+            border-radius: 2px;
+        }
+
+        /* Document Input Base Fields */
+        input[type="text"], textarea {
+            width: 100%;
+            border: none;
+            background: transparent;
+            font-size: 13px;
+            color: var(--text-color);
+            outline: none;
+        }
+
+        textarea {
+            resize: none;
+            font-family: inherit;
+        }
+
+        /* Bullet List Configurations (Overview & Notes Sections) */
+        .bullet-list-block {
+            padding-left: 10px;
+        }
+
+        .bullet-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .bullet-row::before {
+            content: "•";
+            color: var(--accent-red);
+            font-weight: bold;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+
+        .bullet-row label {
+            font-weight: bold;
+            width: 220px;
+            flex-shrink: 0;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .bullet-row input {
+            border-bottom: 1px solid var(--border-color);
+            padding: 2px 4px;
+        }
+
+        /* Grid Framework Tables */
+        .crew-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 5px;
+        }
+
+        .crew-table th {
+            background-color: #000000;
+            color: var(--text-color);
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            text-align: left;
+        }
+
+        .crew-table td {
+            border: 1px solid var(--border-color);
+            padding: 4px 8px;
+            vertical-align: middle;
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        .crew-table input {
+            padding: 4px;
+        }
+
+        /* Sub-Department Header Tiers */
+        .sub-dept-header {
+            background-color: #111111 !important;
+            font-weight: bold;
+            font-size: 13px;
+            color: #6ba4e8;
+            padding: 6px 8px !important;
+        }
+
+        /* Document Operations Row */
+        .doc-action-row {
+            margin-top: 5px;
+            margin-bottom: 15px;
+            text-align: right;
+        }
+
+        .doc-action-row button {
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            padding: 4px 12px;
+            font-size: 11px;
+            color: var(--text-color);
+        }
+
+        .doc-action-row button:hover {
+            background-color: #333;
+        }
+
+        .delete-btn {
+            background: transparent;
+            color: var(--accent-red);
+            font-weight: bold;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+        }
+        .delete-btn:hover {
+            color: #ff2e3a;
+        }
+
+        /* --- PRINT ENGINE OPTIMIZATION FLIP --- */
+        @media print {
+            @page {
+                size: letter portrait;
+                margin: 0.4in;
+            }
+            body {
+                background: #ffffff !important;
+                color: #000000 !important;
+                padding-bottom: 0;
+            }
+            .navbar, .manager-bar, .doc-action-row, .delete-btn, button, .delete-btn-col {
+                display: none !important;
+            }
+            .document-container {
+                max-width: 100%;
+                box-shadow: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                background: #ffffff !important;
+                color: #000000 !important;
+                border: none !important;
+            }
+            .doc-main-title {
+                color: #000000 !important;
+                border-bottom: 2px solid #000000 !important;
+            }
+            .doc-main-title input {
+                color: #000000 !important;
+            }
+            .section-header-banner {
+                background-color: #f2f2f2 !important;
+                color: #000000 !important;
+                border: 1px solid #000000 !important;
+            }
+            .bullet-row::before {
+                color: #000000 !important;
+            }
+            .bullet-row label {
+                color: #000000 !important;
+            }
+            .bullet-row input {
+                color: #333333 !important;
+                border-bottom: 1px dashed #888888 !important;
+            }
+            .crew-table th {
+                background-color: #e6e6e6 !important;
+                color: #000000 !important;
+                border: 1px solid #888888 !important;
+            }
+            .crew-table td {
+                border: 1px solid #888888 !important;
+                background: #ffffff !important;
+            }
+            .crew-table input {
+                color: #000000 !important;
+            }
+            .sub-dept-header {
+                background-color: #f9f9f9 !important;
+                color: #000000 !important;
+                border-bottom: 1px solid #888888 !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVIGATION BAR -->
+    <nav class="navbar">
+        <a class="navbar-brand" href="index.html">
+            <img src="Invinc.png" alt="Invincible Studio">
+        </a>
+        <ul class="navbar-nav">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="cast.html">Back</a></li>
+        </ul>
+    </nav>
+
+    <!-- ROSTER STORAGE CONTROLS -->
+    <div class="manager-bar">
+        <div class="manager-group">
+            <label for="crew-selector">Saved Crew Profiles:</label>
+            <select id="crew-selector" onchange="loadCrewSheet()">
+                <option value="default">-- Create Blank Profile --</option>
+            </select>
+            <button class="btn-secondary" onclick="deleteCrewProfile()">Delete Profile</button>
+        </div>
+        <div class="manager-group">
+            <input type="text" id="save-profile-input" class="nav-input" placeholder="Enter Profile Name...">
+            <button onclick="saveCrewSheet()">Save Roster</button>
+            <button onclick="window.print()">Export Document PDF</button>
+        </div>
+    </div>
+
+    <!-- MAIN CREW LEDGER SHEET LAYER -->
+    <div class="document-container">
+
+        <!-- HEADER BANNER -->
+        <div class="doc-main-title">
+            <input type="text" data-field="crew_main_title" placeholder="[ENTER PROJECT TITLE] - OFFICIAL CREW LIST">
+        </div>
+
+        <!-- SECTION 1: PRODUCTION OVERVIEW -->
+        <div class="section-header-banner">Production Overview</div>
+        <div class="bullet-list-block">
+            <div class="bullet-row">
+                <label>Project Type:</label>
+                <input type="text" data-field="po_project_type" placeholder="e.g. Feature Film, Commercial">
+            </div>
+            <div class="bullet-row">
+                <label>Production Company:</label>
+                <input type="text" data-field="po_prod_company" placeholder="Enter Company Name">
+            </div>
+            <div class="bullet-row">
+                <label>Line Producer / UPM:</label>
+                <input type="text" data-field="po_producers" placeholder="Enter Name(s)">
+            </div>
+            <div class="bullet-row">
+                <label>Production Office Address:</label>
+                <input type="text" data-field="po_office_address" placeholder="Enter Physical Address">
+            </div>
+        </div>
+
+        <!-- SECTION 2: KEY PRODUCTION CONTACTS TABLE -->
+        <div class="section-header-banner">Key Production Contacts</div>
+        <table class="crew-table" id="key-contacts-table">
+            <thead>
+                <tr>
+                    <th style="width: 22%;">Department / Role</th>
+                    <th style="width: 22%;">Name</th>
+                    <th style="width: 16%;">Phone Number</th>
+                    <th style="width: 20%;">Email</th>
+                    <th style="width: 16%;">Emergency Contact</th>
+                    <th style="width: 4%; text-align: center;" class="delete-btn-col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Populated dynamically via append loop -->
+            </tbody>
+        </table>
+        <div class="doc-action-row">
+            <button type="button" onclick="addKeyContactRow()">+ Add Key Contact Line</button>
+        </div>
+
+        <!-- SECTION 3: DEPARTMENTAL BREAKDOWN (MAIN TRUNK MODULE) -->
+        <div class="section-header-banner">Departmental Breakdown</div>
+        <table class="crew-table" id="dept-breakdown-table">
+            <thead>
+                <tr>
+                    <th style="width: 44%;">Departmental Role / Designation</th>
+                    <th style="width: 16%;">Phone Number</th>
+                    <th style="width: 36%;">Email</th>
+                    <th style="width: 4%; text-align: center;" class="delete-btn-col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Segment headers and inner input lines are added dynamically below -->
+            </tbody>
+        </table>
+        <div class="doc-action-row">
+            <button type="button" onclick="addDeptHeaderRow()">+ Add Sub-Department Header Section</button>
+            <button type="button" onclick="addDeptCrewRow()">+ Add Crew Line Item</button>
+        </div>
+
+        <!-- SECTION 4: POST-PRODUCTION TEAM -->
+        <div class="section-header-banner">Post-Production Team</div>
+        <table class="crew-table" id="post-production-table">
+            <thead>
+                <tr>
+                    <th style="width: 44%;">Role / Assignment</th>
+                    <th style="width: 16%;">Phone Number</th>
+                    <th style="width: 36%;">Email</th>
+                    <th style="width: 4%; text-align: center;" class="delete-btn-col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Populated dynamically via append loop -->
+            </tbody>
+        </table>
+        <div class="doc-action-row">
+            <button type="button" onclick="addPostProductionRow()">+ Add Post Line Item</button>
+        </div>
+
+        <!-- SECTION 5: VITAL CREW NOTES & GUIDELINES -->
+        <div class="section-header-banner">📋 Vital Crew Notes & Guidelines</div>
+        <div class="bullet-list-block" id="vital-notes-wrapper">
+            <!-- Populated dynamically via append loop -->
+        </div>
+        <div class="doc-action-row">
+            <button type="button" onclick="addVitalNoteRow()">+ Add Vital Note Line</button>
+        </div>
+
+    </div>
+
+    <!-- LOCAL CORE APP CONTROLLER INTERACTION MACHINE -->
+    <script>
+        window.onload = function() {
+            clearWorkspaceToDefault();
+            refreshProfileSelector();
+        };
+
+        function clearWorkspaceToDefault() {
+            // Wipe out all metadata values 
+            document.querySelectorAll('[data-field]').forEach(el => el.value = '');
+
+            // 1. Reset Key Contacts
+            const keyBody = document.querySelector('#key-contacts-table tbody');
+            keyBody.innerHTML = '';
+            addKeyContactRow("Director");
+            addKeyContactRow("1st Assistant Director");
+            addKeyContactRow("Production Manager");
+            addKeyContactRow("Safety Coordinator");
+
+            // 2. Reset Departmental Breakdown
+            const deptBody = document.querySelector('#dept-breakdown-table tbody');
+            deptBody.innerHTML = '';
+            
+            addDeptHeaderRow("🎥 Camera & Lighting Department");
+            addDeptCrewRow("Director of Photography (DP), Camera Operator");
+            addDeptCrewRow("1st AC, Gaffer, Key Grip");
+            
+            addDeptHeaderRow("👩‍🎨 Art, Wardrobe & HMU (Hair/Makeup)");
+            addDeptCrewRow("Production Designer, Art Director");
+            addDeptCrewRow("Costume Designer / Wardrobe, Key Hair & Makeup Artist");
+
+            addDeptHeaderRow("🔊 Sound & Script");
+            addDeptCrewRow("Production Sound Mixer, Boom Operator");
+            addDeptCrewRow("Script Supervisor");
+
+            addDeptHeaderRow("🚚 Logistics & Support");
+            addDeptCrewRow("Location Manager, Key PA, Catering / Craft Services");
+
+            // 3. Reset Post Production Team
+            const postBody = document.querySelector('#post-production-table tbody');
+            postBody.innerHTML = '';
+            addPostProductionRow("Lead Editor, Sound Designer / Re-recording Mixer, Colorist");
+
+            // 4. Reset Vital Notes Block
+            const notesWrapper = document.getElementById('vital-notes-wrapper');
+            notesWrapper.innerHTML = '';
+            addVitalNoteRow("Daily Call Sheets:", "Take note of timeline sequences and protocol updates posted on individual sheets.");
+            addVitalNoteRow("Dietary Restrictions:", "Please communicate explicit dietary constraints to the catering unit 24 hours prior to sets.");
+        }
+
+    /* --- DYNAMIC ROW INJECTION UTILITIES --- */
+        function addKeyContactRow(role = '', name = '', phone = '', email = '', emergency = '') {
+            const tbody = document.querySelector('#key-contacts-table tbody');
+            const tr = document.createElement('tr');
+            tr.className = "key-contact-item-row";
+            tr.innerHTML = `
+                <td><input type="text" class="kc-role" value="${role}" placeholder="e.g. Director"></td>
+                <td><input type="text" class="kc-name" value="${name}" placeholder="Name"></td>
+                <td><input type="text" class="kc-phone" value="${phone}" placeholder="555-0000"></td>
+                <td><input type="text" class="kc-email" value="${email}" placeholder="email@domain.com"></td>
+                <td><input type="text" class="kc-emergency" value="${emergency}" placeholder="Name / Relationship / Phone"></td>
+                <td style="text-align:center;" class="delete-btn-col"><button type="button" class="delete-btn" onclick="this.closest('tr').remove()">×</button></td>
+            `;
+            tbody.appendChild(tr);
+        }
+
+        function addDeptHeaderRow(title = '') {
+            const tbody = document.querySelector('#dept-breakdown-table tbody');
+            const tr = document.createElement('tr');
+            tr.className = "dept-header-item-row";
+            tr.innerHTML = `
+                <td colspan="3" class="sub-dept-header"><input type="text" style="color:inherit; font-weight:bold; font-size:inherit;" value="${title}" placeholder="🎬 NEW DEPARTMENT ENTERPRISE SECTION"></td>
+                <td style="text-align:center; background-color:#111;" class="delete-btn-col"><button type="button" class="delete-btn" onclick="this.closest('tr').remove()">×</button></td>
+            `;
+            tbody.appendChild(tr);
+        }
+
+        function addDeptCrewRow(role = '', phone = '', email = '') {
+            const tbody = document.querySelector('#dept-breakdown-table tbody');
+            const tr = document.createElement('tr');
+            tr.className = "dept-crew-item-row";
+            tr.innerHTML = `
+                <td><input type="text" class="dc-role" value="${role}" placeholder="e.g. Director of Photography (DP)"></td>
+                <td><input type="text" class="dc-phone" value="${phone}" placeholder="📞 555-0000"></td>
+                <td><input type="text" class="dc-email" value="${email}" placeholder="✉️ email@domain.com"></td>
+                <td style="text-align:center;" class="delete-btn-col"><button type="button" class="delete-btn" onclick="this.closest('tr').remove()">×</button></td>
+            `;
+            tbody.appendChild(tr);
+        }
+
+        function addPostProductionRow(role = '', phone = '', email = '') {
+            const tbody = document.querySelector('#post-production-table tbody');
+            const tr = document.createElement('tr');
+            tr.className = "post-item-row";
+            tr.innerHTML = `
+                <td><input type="text" class="pp-role" value="${role}" placeholder="e.g. Editor"></td>
+                <td><input type="text" class="pp-phone" value="${phone}" placeholder="📞 555-0000"></td>
+                <td><input type="text" class="pp-email" value="${email}" placeholder="✉️ email@domain.com"></td>
+                <td style="text-align:center;" class="delete-btn-col"><button type="button" class="delete-btn" onclick="this.closest('tr').remove()">×</button></td>
+            `;
+            tbody.appendChild(tr);
+        }
+
+        function addVitalNoteRow(label = '', content = '') {
+            const wrapper = document.getElementById('vital-notes-wrapper');
+            const div = document.createElement('div');
+            div.className = "bullet-row vital-note-item-node";
+            div.innerHTML = `
+                <label><input type="text" class="vn-label" style="font-weight:bold; color:inherit;" value="${label}" placeholder="Header Label:"></label>
+                <input type="text" class="vn-content" value="${content}" placeholder="Type vital production rule instructions here...">
+                <button type="button" class="delete-btn delete-btn-col" style="margin-left:10px; padding:0 4px;" onclick="this.closest('.bullet-row').remove()">×</button>
+            `;
+            wrapper.appendChild(div);
+        }
+
+        /* --- STABLE STORAGE DATABASING MOTORS --- */
+        function getStorageDatabase() {
+            const data = localStorage.getItem('invincible_crew_v1');
+            return data ? JSON.parse(data) : {};
+        }
+
+        function refreshProfileSelector() {
+            const selector = document.getElementById('crew-selector');
+            const db = getStorageDatabase();
+
+            selector.innerHTML = '<option value="default">-- Create Blank Profile --</option>';
+            Object.keys(db).forEach(key => {
+                const opt = document.createElement('option');
+                opt.value = key;
+                opt.textContent = key;
+                selector.appendChild(opt);
+            });
+        }
+
+        function saveCrewSheet() {
+            const profileName = document.getElementById('save-profile-input').value.trim();
+            if (!profileName) {
+                alert("Please declare a unique crew roster name parameter to save dataset.");
+                return;
+            }
+
+            const activeDataset = {
+                fields: {},
+                keyContacts: [],
+                deptBreakdown: [],
+                postProduction: [],
+                vitalNotes: []
+            };
+
+            // Grab top and overview layout values
+            document.querySelectorAll('[data-field]').forEach(input => {
+                activeDataset.fields[input.getAttribute('data-field')] = input.value;
+            });
+
+            // Grab Section 2: Key Contacts
+            document.querySelectorAll('.key-contact-item-row').forEach(row => {
+                activeDataset.keyContacts.push({
+                    role: row.querySelector('.kc-role').value,
+                    name: row.querySelector('.kc-name').value,
+                    phone: row.querySelector('.kc-phone').value,
+                    email: row.querySelector('.kc-email').value,
+                    emergency: row.querySelector('.kc-emergency').value
+                });
+            });
+
+            // Grab Section 3: Departmental Breakdowns (Interlocking Rows Array Order Preserved)
+            document.querySelectorAll('#dept-breakdown-table tbody tr').forEach(row => {
+                if (row.classList.contains('dept-header-item-row')) {
+                    activeDataset.deptBreakdown.push({
+                        type: 'header',
+                        title: row.querySelector('input').value
+                    });
+                } else if (row.classList.contains('dept-crew-item-row')) {
+                    activeDataset.deptBreakdown.push({
+                        type: 'crew',
+                        role: row.querySelector('.dc-role').value,
+                        phone: row.querySelector('.dc-phone').value,
+                        email: row.querySelector('.dc-email').value
+                    });
+                }
+            });
+
+            // Grab Section 4: Post-Production
+            document.querySelectorAll('.post-item-row').forEach(row => {
+                activeDataset.postProduction.push({
+                    role: row.querySelector('.pp-role').value,
+                    phone: row.querySelector('.pp-phone').value,
+                    email: row.querySelector('.pp-email').value
+                });
+            });
+
+            // Grab Section 5: Vital Notes
+            document.querySelectorAll('.vital-note-item-node').forEach(node => {
+                activeDataset.vitalNotes.push({
+                    label: node.querySelector('.vn-label').value,
+                    content: node.querySelector('.vn-content').value
+                });
+            });
+
+            const database = getStorageDatabase();
+            database[profileName] = activeDataset;
+            localStorage.setItem('invincible_crew_v1', JSON.stringify(database));
+
+            refreshProfileSelector();
+            document.getElementById('crew-selector').value = profileName;
+            alert(`"${profileName}" safely compiled to local storage cluster data memory.`);
+        }
+
+        function loadCrewSheet() {
+            const key = document.getElementById('crew-selector').value;
+            if (key === 'default') {
+                clearWorkspaceToDefault();
+                document.getElementById('save-profile-input').value = '';
+                return;
+            }
+
+            const db = getStorageDatabase();
+            const config = db[key];
+            if (!config) return;
+
+            document.getElementById('save-profile-input').value = key;
+
+            // Load single dataset parameters
+            Object.keys(config.fields).forEach(f => {
+                const targetNode = document.querySelector(`[data-field="${f}"]`);
+                if (targetNode) targetNode.value = config.fields[f];
+            });
+
+            // Rebuild Key Contacts Table
+            const keyBody = document.querySelector('#key-contacts-table tbody');
+            keyBody.innerHTML = '';
+            config.keyContacts.forEach(row => {
+                addKeyContactRow(row.role, row.name, row.phone, row.email, row.emergency);
+            });
+
+            // Rebuild Department Breakdown Array Nodes
+            const deptBody = document.querySelector('#dept-breakdown-table tbody');
+            deptBody.innerHTML = '';
+            config.deptBreakdown.forEach(row => {
+                if (row.type === 'header') {
+                    addDeptHeaderRow(row.title);
+                } else if (row.type === 'crew') {
+                    addDeptCrewRow(row.role, row.phone, row.email);
+                }
+            });
+
+            // Rebuild Post Production
+            const postBody = document.querySelector('#post-production-table tbody');
+            postBody.innerHTML = '';
+            config.postProduction.forEach(row => {
+                addPostProductionRow(row.role, row.phone, row.email);
+            });
+
+            // Rebuild Vital Notes Cards
+            const notesWrapper = document.getElementById('vital-notes-wrapper');
+            notesWrapper.innerHTML = '';
+            config.vitalNotes.forEach(node => {
+                addVitalNoteRow(node.label, node.content);
+            });
+        }
+
+        function deleteCrewProfile() {
+            const targetProfile = document.getElementById('crew-selector').value;
+            if (targetProfile === 'default') return;
+
+            if (confirm(`Are you certain you want to erase "${targetProfile}" from local app storage configuration directories?`)) {
+                const db = getStorageDatabase();
+                delete db[targetProfile];
+                localStorage.setItem('invincible_crew_v1', JSON.stringify(db));
+
+                document.getElementById('save-profile-input').value = '';
+                refreshProfileSelector();
+                clearWorkspaceToDefault();
+            }
+        }
+    </script>
+</body>
+</html>

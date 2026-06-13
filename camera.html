@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invincible Studio - Official Camera Report</title>
+    <style>
+        /* --- NETFLIX DARK THEME UI STYLES --- */
+        :root {
+            --bg-color: #141414;
+            --card-bg: #1f1f1f;
+            --accent-red: #E50914;
+            --text-color: #F5F5F7;
+            --text-muted: #808080;
+            --border-color: #333333;
+            --input-bg: #2b2b2b;
+            
+            /* UI Dark Elements */
+            --header-blue: #0f2537;
+            --section-blue: #14355a;
+            --table-green: #1c3b18;
+            --table-orange: #5e3219;
+            --table-red: #4d1414;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding-bottom: 60px;
+        }
+
+        /* Navbar Layout */
+        .navbar {
+            background-color: #000000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 4%;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 2px solid var(--accent-red);
+        }
+
+        .navbar-brand img {
+            height: 35px;
+            vertical-align: middle;
+        }
+
+        .navbar-nav {
+            list-style: none;
+            display: flex;
+            gap: 25px;
+        }
+
+        .navbar-nav a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .navbar-nav a:hover {
+            color: var(--accent-red);
+        }
+
+        /* Workspace Controls Toolbar */
+        .manager-bar {
+            max-width: 1200px;
+            margin: 20px auto;
+            background: var(--card-bg);
+            padding: 15px 20px;
+            border-radius: 6px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid var(--border-color);
+        }
+
+        .manager-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        select, input[type="text"].nav-input {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 8px 12px;
+            border-radius: 4px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        button {
+            background-color: var(--accent-red);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background-color: #b80710;
+        }
+
+        button.btn-secondary {
+            background-color: #444;
+        }
+        button.btn-secondary:hover {
+            background-color: #555;
+        }
+
+        /* --- ALL-DARK CAMERA REPORT CANVAS --- */
+        .document-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--card-bg); /* Completely Dark background on screen */
+            color: var(--text-color);
+            padding: 25px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.6);
+        }
+
+        /* Structural Framework Utilities */
+        .grid-row {
+            display: flex;
+            width: 100%;
+        }
+
+        .grid-col {
+            flex: 1;
+            border: 1px solid var(--border-color);
+            margin-right: -1px;
+            margin-bottom: -1px;
+            padding: 8px;
+            background: #1a1a1a;
+        }
+
+        /* Main Header Bar Banner */
+        .report-header-banner {
+            background-color: #000000;
+            color: var(--text-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 10px;
+        }
+
+        .header-title-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-title-area h1 {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: var(--text-color);
+        }
+
+        .header-date-box {
+            border: 1px solid var(--border-color);
+            padding: 6px 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+            font-weight: bold;
+            background: var(--input-bg);
+        }
+
+        .header-date-box input {
+            color: var(--text-color);
+            text-align: center;
+            width: 100px;
+            border: none;
+            background: transparent;
+            outline: none;
+            font-size: 13px;
+        }
+
+        /* Metadata Parameters Input Labels */
+        .field-input-wrapper {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            font-size: 11px;
+            font-weight: bold;
+            color: var(--text-muted);
+        }
+
+        .field-input-wrapper label {
+            text-transform: uppercase;
+            white-space: nowrap;
+            margin-right: 8px;
+        }
+
+        .field-input-wrapper input[type="text"] {
+            width: 100%;
+            border: none;
+            border-bottom: 1px solid var(--border-color);
+            background: transparent;
+            padding: 2px 4px;
+            font-size: 12px;
+            color: var(--text-color);
+            outline: none;
+        }
+
+        /* Custom Inline Checkboxes alignment */
+        .inline-checkbox-options {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-left: auto;
+        }
+
+        .inline-checkbox-options label {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            color: var(--text-color) !important;
+            text-transform: none !important;
+        }
+
+        /* Master Detailed Log Table Layout */
+        .log-master-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        .log-master-table th {
+            border: 1px solid var(--border-color);
+            color: #ffffff;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            padding: 6px 4px;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        /* Reference Specific Header Segment Color Blocks */
+        .th-shot-id { background-color: var(--header-blue); }
+        .th-lens-settings { background-color: var(--table-green); }
+        .th-media-info { background-color: var(--section-blue); }
+        .th-take-info { background-color: var(--table-orange); }
+        .th-notes-header { background-color: var(--table-red); }
+
+        .log-master-table td {
+            border: 1px solid var(--border-color);
+            padding: 0;
+            background: #161616;
+        }
+
+        .log-master-table input[type="text"] {
+            width: 100%;
+            border: none;
+            background: transparent;
+            padding: 6px 3px;
+            font-size: 12px;
+            color: var(--text-color);
+            text-align: center;
+            outline: none;
+        }
+
+        /* Bottom Config Checklist Sub-Grid Frameworks */
+        .quad-blocks-wrapper {
+            display: grid;
+            grid-template-columns: 1.2fr 1.5fr 1.5fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .quad-card {
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            background: #161616;
+        }
+
+        .quad-card-header {
+            background-color: var(--header-blue);
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+            padding: 6px;
+            text-align: center;
+            letter-spacing: 0.5px;
+        }
+
+        .quad-card-content {
+            padding: 12px;
+            flex-grow: 1;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .checklist-group-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 3px;
+            margin-bottom: 8px;
+            margin-top: 5px;
+            color: var(--text-muted);
+        }
+
+        .checklist-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px 10px;
+            margin-bottom: 10px;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            color: var(--text-color);
+        }
+
+        .field-row-block {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            gap: 8px;
+        }
+        .field-row-block label { white-space: nowrap; text-transform: uppercase; color: var(--text-muted);}
+        .field-row-block input[type="text"] {
+            width: 100%;
+            border: none;
+            border-bottom: 1px solid var(--border-color);
+            background: transparent;
+            outline: none;
+            font-size: 12px;
+            color: var(--text-color);
+            padding: 2px;
+        }
+
+        /* Extended Notes / Signatures Block Wrapper Split */
+        .extended-block-split {
+            display: grid;
+            grid-template-columns: 1.2fr 1.8fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .textarea-box-wrapper {
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            background: #161616;
+        }
+
+        .textarea-box-wrapper textarea {
+            width: 100%;
+            flex-grow: 1;
+            height: 80px;
+            border: none;
+            background: transparent;
+            resize: none;
+            outline: none;
+            padding: 8px;
+            font-size: 12px;
+            color: var(--text-color);
+            font-family: inherit;
+        }
+
+        /* Quality Guide Reference Legend Card */
+        .quality-guide-bar {
+            background-color: #000000;
+            color: #ffffff;
+            padding: 6px 12px;
+            font-size: 11px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 15px;
+        }
+
+        .guide-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-transform: uppercase;
+            font-size: 10px;
+        }
+
+        .dot-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        /* Summary Calculations Metrics Grid Block */
+        .summary-metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            border: 1px solid var(--border-color);
+            background: #161616;
+            padding: 12px 15px;
+            gap: 8px 40px;
+        }
+
+        /* --- CRITICAL PRINT VECTOR STYLESHEET RESETS --- */
+        @media print {
+            @page {
+                size: letter landscape;
+                margin: 0.3in;
+            }
+            body {
+                background: #ffffff !important;
+                color: #000000 !important;
+                padding-bottom: 0;
+            }
+            .navbar, .manager-bar, button {
+                display: none !important;
+            }
+            .document-container {
+                max-width: 100%;
+                box-shadow: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                background: transparent !important;
+                border: none !important;
+            }
+            .grid-col, .quad-card, .textarea-box-wrapper, .summary-metrics-grid, .log-master-table td {
+                background: #ffffff !important;
+                border: 1px solid #000000 !important;
+            }
+            input[type="text"], textarea {
+                color: #000000 !important;
+                background: transparent !important;
+            }
+            .field-row-block label, .field-input-wrapper label, .checklist-group-title {
+                color: #000000 !important;
+            }
+            .report-header-banner, .quad-card-header, .quality-guide-bar {
+                background-color: #e6e6e6 !important;
+                color: #000000 !important;
+                border: 1px solid #000000 !important;
+            }
+            .header-date-box { border-color: #000000 !important; background: transparent !important;}
+            .header-date-box input { color: #000000 !important; }
+            .log-master-table th {
+                background-color: #f2f2f2 !important;
+                color: #000000 !important;
+                border: 1px solid #000000 !important;
+                font-size: 8px !important;
+            }
+            .checklist-group-title { border-bottom-color: #000000 !important; }
+            .dot-indicator { border: 1px solid #000000 !important; }
+            .field-row-block input[type="text"], .field-input-wrapper input[type="text"] {
+                border-bottom-color: #000000 !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVIGATION BAR -->
+    <nav class="navbar">
+        <a class="navbar-brand" href="index.html">
+            <img src="Invinc.png" alt="Invincible Studio Logo">
+        </a>
+        <ul class="navbar-nav">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="production.html">Back</a></li>
+        </ul>
+    </nav>
+
+    <!-- WORKSPACE RECOVERY TOOLBAR BAR -->
+    <div class="manager-bar">
+        <div class="manager-group">
+            <label for="report-selector">Saved Camera Logs:</label>
+            <select id="report-selector" onchange="loadCameraReport()">
+                <option value="default">-- Create Blank Report --</option>
+            </select>
+            <button class="btn-secondary" onclick="deleteCameraProfile()">Delete Log</button>
+        </div>
+        <div class="manager-group">
+            <input type="text" id="save-profile-input" class="nav-input" placeholder="Roll Name / Shoot Day...">
+            <button onclick="saveCameraReport()">Save Log</button>
+            <button onclick="window.print()">Export Report PDF</button>
+        </div>
+    </div>
+
+    <!-- MAIN FILE MATRIX CANVAS CONTAINER -->
+    <div class="document-container">
+        
+        <!-- HEADER TOP BANNER FRAME -->
+        <div class="report-header-banner">
+            <div class="header-title-area">
+                <span style="font-size:24px; line-height:1;">🎥</span>
+                <h1>CAMERA REPORT</h1>
+            </div>
+            <div class="header-date-box">
+                <span>DATE:</span>
+                <input type="text" data-cam="header_date" placeholder="/      /">
+            </div>
+        </div>
+
+        <!-- METADATA INFORMATION ROW BLOCK LAYER -->
+        <div class="grid-row">
+            <div class="grid-col" style="flex: 1.2;">
+                <div class="field-row-block" style="margin-bottom:6px;"><label>Production:</label><input type="text" data-cam="meta_production"></div>
+                <div class="field-row-block" style="margin-bottom:6px;"><label>Director:</label><input type="text" data-cam="meta_director"></div>
+                <div class="field-row-block" style="margin-bottom:6px;"><label>DOP:</label><input type="text" data-cam="meta_dop"></div>
+                <div class="field-row-block" style="margin-bottom:0;"><label>Camera Operator:</label><input type="text" data-cam="meta_operator"></div>
+            </div>
+            
+            <div class="grid-col" style="flex: 1.1;">
+                <div class="field-input-wrapper" style="margin-bottom:10px;">
+                    <label>Camera:</label>
+                    <div class="inline-checkbox-options">
+                        <label><input type="checkbox" id="cam_type_a"> A CAM</label>
+                        <label><input type="checkbox" id="cam_type_b"> B CAM</label>
+                        <label><input type="checkbox" id="cam_type_other"> OTHER</label>
+                        <input type="text" data-cam="meta_cam_other_text" style="width:50px; border-bottom:1px solid var(--border-color); height:16px;">
+                    </div>
+                </div>
+                <div class="field-row-block" style="margin-bottom:6px;"><label>Camera ID / Serial:</label><input type="text" data-cam="meta_cam_serial"></div>
+                <div class="field-row-block" style="margin-bottom:6px;"><label>Shoot Day:</label><input type="text" data-cam="meta_shoot_day"></div>
+                <div class="field-row-block" style="margin-bottom:0;"><label>Location:</label><input type="text" data-cam="meta_location"></div>
+            </div>
+            
+            <div class="grid-col" style="flex: 1.1;">
+                <div class="field-input-wrapper" style="margin-bottom:10px;">
+                    <label>Card Format:</label>
+                    <div class="inline-checkbox-options" style="gap:8px;">
+                        <label><input type="checkbox" id="fmt_cfast"> CFast</label>
+                        <label><input type="checkbox" id="fmt_sd"> SD</label>
+                        <label><input type="checkbox" id="fmt_xqd"> XQD</label>
+                        <label><input type="checkbox" id="fmt_other"> Other</label>
+                        <input type="text" data-cam="meta_fmt_other_text" style="width:40px; border-bottom:1px solid var(--border-color); height:16px;">
+                    </div>
+                </div>
+                <div class="field-row-block" style="margin-bottom:6px;"><label>Resolution / Format:</label><input type="text" data-cam="meta_resolution"></div>
+                <div class="field-row-block" style="margin-bottom:6px;"><label>Frame Rate (FPS):</label><input type="text" data-cam="meta_framerate"></div>
+                <div class="field-row-block" style="margin-bottom:0;"><label>Color Profile / Gamma:</label><input type="text" data-cam="meta_color_profile"></div>
+            </div>
+        </div>
+
+    <!-- CENTRAL LOGS SHEET DATA FRAME MATRIX -->
+        <table class="log-master-table">
+            <thead>
+                <tr>
+                    <th colspan="4" class="th-shot-id" style="border-bottom:none;">Shot Identification</th>
+                    <th colspan="6" class="th-lens-settings" style="border-bottom:none;">Lens & Camera Settings</th>
+                    <th colspan="4" class="th-media-info" style="border-bottom:none;">Media & File Info</th>
+                    <th colspan="2" class="th-take-info" style="border-bottom:none;">Take Info</th>
+                    <th class="th-notes-header" style="border-bottom:none;">Notes</th>
+                </tr>
+                <tr>
+                    <th class="th-shot-id" style="width: 4.5%;">Scene</th>
+                    <th class="th-shot-id" style="width: 4.5%;">Shot</th>
+                    <th class="th-shot-id" style="width: 4.5%;">Take</th>
+                    <th class="th-shot-id" style="width: 8%;">Slate / Clap</th>
+                    
+                    <th class="th-lens-settings" style="width: 5%;">Lens<br>(mm)</th>
+                    <th class="th-lens-settings" style="width: 7%;">Focus<br><span style="font-size:7px; text-transform:none;">D / F / INF</span></th>
+                    <th class="th-lens-settings" style="width: 5%;">Aperture<br><span style="font-size:7px; text-transform:none;">(f/)</span></th>
+                    <th class="th-lens-settings" style="width: 4.5%;">ISO</th>
+                    <th class="th-lens-settings" style="width: 5.5%;">Shutter<br><span style="font-size:7px; text-transform:none;">(° / SEC)</span></th>
+                    <th class="th-lens-settings" style="width: 4.5%;">WB<br><span style="font-size:7px; text-transform:none;">(K)</span></th>
+                    
+                    <th class="th-media-info" style="width: 14%;">Clip / File Name</th>
+                    <th class="th-media-info" style="width: 5%;">Card /<br>Reel</th>
+                    <th class="th-media-info" style="width: 5%;">TC In</th>
+                    <th class="th-media-info" style="width: 5%;">TC Out</th>
+                    
+                    <th class="th-take-info" style="width: 5.5%;">Good Take<br><span style="font-size:7px; text-transform:none;">YES / NO</span></th>
+                    <th class="th-take-info" style="width: 6.5%;">Director's<br>Take (✓)</th>
+                    
+                    <th class="th-notes-header" style="width: 12%;">Notes / Remarks</th>
+                </tr>
+            </thead>
+            <tbody id="log-table-rows-container">
+                <!-- Rows map dynamically via initialization -->
+            </tbody>
+        </table>
+
+        <!-- SUB-GRID BLOCKS CHECKLIST SETUPS FRAME -->
+        <div class="quad-blocks-wrapper">
+            <!-- Box 1: Filters & Accessories -->
+            <div class="quad-card">
+                <div class="quad-card-header">Filters & Accessories</div>
+                <div class="quad-card-content">
+                    <div class="field-row-block">
+                        <label>ND Filter:</label>
+                        <div style="display:flex; gap:6px; margin-left:auto; align-items:center;">
+                            <label><input type="checkbox" id="filt_nd_yes"> YES</label>
+                            <label><input type="checkbox" id="filt_nd_no"> NO</label>
+                            <span style="font-size:10px;">ND</span><input type="text" data-cam="filter_nd_value" style="width:35px; border-bottom:1px solid var(--border-color); height:14px;">
+                        </div>
+                    </div>
+                    <div class="field-row-block" style="margin-bottom:15px;">
+                        <label>Polarizer:</label>
+                        <div style="display:flex; gap:10px; margin-left:auto;">
+                            <label><input type="checkbox" id="filt_pol_yes"> YES</label>
+                            <label><input type="checkbox" id="filt_pol_no"> NO</label>
+                        </div>
+                    </div>
+                    <div class="field-row-block"><label>Diffusion / FX:</label><input type="text" data-cam="filter_diffusion"></div>
+                    <div class="field-row-block" style="margin-bottom:0;"><label>Other Accessories:</label><input type="text" data-cam="filter_other_acc"></div>
+                </div>
+            </div>
+
+            <!-- Box 2: Movement & Shot Type -->
+            <div class="quad-card">
+                <div class="quad-card-header">Movement & Shot Type</div>
+                <div class="quad-card-content">
+                    <div class="checklist-group-title">Shot Type</div>
+                    <div class="checklist-grid">
+                        <label class="checklist-item"><input type="checkbox" id="st_wide"> WIDE</label>
+                        <label class="checklist-item"><input type="checkbox" id="st_medium"> MEDIUM</label>
+                        <label class="checklist-item"><input type="checkbox" id="st_closeup"> CLOSE UP</label>
+                        <label class="checklist-item"><input type="checkbox" id="st_ecu"> ECU</label>
+                        <label class="checklist-item"><input type="checkbox" id="st_mcu"> MCU</label>
+                        <label class="checklist-item"><input type="checkbox" id="st_pov"> POV</label>
+                        <label class="checklist-item"><input type="checkbox" id="st_insert"> INSERT</label>
+                        <div class="checklist-item" style="gap:2px;"><label><input type="checkbox" id="st_other"> OTH</label><input type="text" data-cam="st_other_text" style="width:30px; border-bottom:1px solid var(--border-color); height:12px;"></div>
+                    </div>
+                    <div class="checklist-group-title" style="margin-top:2px;">Camera Movement</div>
+                    <div class="checklist-grid" style="margin-bottom:0;">
+                        <label class="checklist-item"><input type="checkbox" id="mv_static"> STATIC</label>
+                        <label class="checklist-item"><input type="checkbox" id="mv_pan"> PAN</label>
+                        <label class="checklist-item"><input type="checkbox" id="mv_tilt"> TILT</label>
+                        <label class="checklist-item"><input type="checkbox" id="mv_dolly"> DOLLY</label>
+                        <label class="checklist-item"><input type="checkbox" id="mv_track"> TRACK</label>
+                        <label class="checklist-item"><input type="checkbox" id="mv_handheld"> HANDHELD</label>
+                        <label class="checklist-item"><input type="checkbox" id="mv_steadicam"> STEADICAM</label>
+                        <div class="checklist-item" style="gap:2px;"><label><input type="checkbox" id="mv_other"> OTH</label><input type="text" data-cam="mv_other_text" style="width:30px; border-bottom:1px solid var(--border-color); height:12px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Box 3: Lighting & Conditions -->
+            <div class="quad-card">
+                <div class="quad-card-header">Lighting & Conditions</div>
+                <div class="quad-card-content">
+                    <div class="checklist-group-title">Lighting Type</div>
+                    <div class="checklist-grid" style="grid-template-columns: 1.1fr 1.1fr 0.8fr;">
+                        <label class="checklist-item"><input type="checkbox" id="lt_natural"> NATURAL</label>
+                        <label class="checklist-item"><input type="checkbox" id="lt_practical"> PRACTICAL</label>
+                        <label class="checklist-item"><input type="checkbox" id="lt_hmi"> HMI</label>
+                        <label class="checklist-item"><input type="checkbox" id="lt_led"> LED</label>
+                        <label class="checklist-item"><input type="checkbox" id="lt_tungsten"> TUNGSTEN</label>
+                        <label class="checklist-item"><input type="checkbox" id="lt_mixed"> MIXED</label>
+                        <label class="checklist-item" style="grid-column: span 3;"><input type="checkbox" id="lt_other"> OTHER</label>
+                    </div>
+                    <div class="checklist-group-title" style="margin-top:4px;">Weather / Conditions</div>
+                    <div class="checklist-grid" style="margin-bottom:0;">
+                        <label class="checklist-item"><input type="checkbox" id="wt_sunny"> SUNNY</label>
+                        <label class="checklist-item"><input type="checkbox" id="wt_cloudy"> CLOUDY</label>
+                        <label class="checklist-item"><input type="checkbox" id="wt_rain"> RAIN</label>
+                        <label class="checklist-item"><input type="checkbox" id="wt_night"> NIGHT</label>
+                        <label class="checklist-item"><input type="checkbox" id="wt_indoor"> INDOOR</label>
+                        <label class="checklist-item" style="grid-column: span 2; gap:4px;"><input type="checkbox" id="wt_other"> OTHER <input type="text" data-cam="wt_other_text" style="width:40px; border-bottom:1px solid var(--border-color); height:12px;"></label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- LOWER SECTION COMPLEMENTARY FIELDS BLOCK GRID -->
+        <div class="extended-block-split">
+            <!-- Column Block 1: Structural Notes Card Box -->
+            <div class="textarea-box-wrapper">
+                <div class="quad-card-header" style="text-align:left; padding-left:8px;">Notes</div>
+                <textarea id="notes-comments-area" data-cam="textarea_block_notes" placeholder="Enter general configuration remarks, field parameters details, or lens calculations updates here..."></textarea>
+            </div>
+
+            <!-- Column Block 2: Sound Sync & Data Backup Fields Matrices -->
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <div class="grid-row">
+                    <!-- Sound Sync Card -->
+                    <div class="quad-card" style="flex:1; margin-right:5px;">
+                        <div class="quad-card-header">Sound Sync</div>
+                        <div class="quad-card-content">
+                            <div class="field-row-block">
+                                <label>Sync Sound:</label>
+                                <div style="display:flex; gap:10px; margin-left:auto;">
+                                    <label><input type="checkbox" id="snd_sync_yes"> YES</label>
+                                    <label><input type="checkbox" id="snd_sync_no"> NO</label>
+                                </div>
+                            </div>
+                            <div class="field-input-wrapper" style="margin-bottom:8px;">
+                                <label style="font-size:10px; color:var(--text-muted);">Sync Method:</label>
+                                <div style="display:flex; gap:6px; margin-left:auto; flex-wrap:wrap;">
+                                    <label><input type="checkbox" id="sm_tc"> TC</label>
+                                    <label><input type="checkbox" id="sm_jam"> JAM</label>
+                                    <label><input type="checkbox" id="sm_clap"> CLAP</label>
+                                </div>
+                            </div>
+                            <div class="field-row-block" style="margin-bottom:0;"><label>Notes:</label><input type="text" data-cam="sound_sync_notes"></div>
+                        </div>
+                    </div>
+
+                    <!-- Data / Backup Card -->
+                    <div class="quad-card" style="flex:1; margin-left:5px;">
+                        <div class="quad-card-header">Data / Backup</div>
+                        <div class="quad-card-content">
+                            <div class="field-row-block">
+                                <label>Data Offload:</label>
+                                <div style="display:flex; gap:10px; margin-left:auto;">
+                                    <label><input type="checkbox" id="bak_offload_yes"> YES</label>
+                                    <label><input type="checkbox" id="bak_offload_no"> NO</label>
+                                </div>
+                            </div>
+                            <div class="field-row-block"><label>Backup Location / Drive ID:</label><input type="text" data-cam="bak_drive_id"></div>
+                            <div class="field-row-block" style="margin-bottom:0;"><label>Verified By:</label><input type="text" data-cam="bak_verified_by"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Signatures Space Block -->
+                <div class="grid-row" style="border:1px solid var(--border-color); padding:10px; font-size:11px; font-weight:bold; background:rgba(0,0,0,0.2); flex-grow:1; align-items:center;">
+                    <div style="flex:1; display:flex; flex-direction:column; gap:8px; padding-right:15px;">
+                        <div class="field-row-block" style="margin-bottom:0;"><label>Camera Operator Signature:</label><input type="text" placeholder="____________________________________________" disabled style="border:none;"></div>
+                    </div>
+                    <div style="flex:1; display:flex; flex-direction:column; gap:8px; padding-left:15px; border-left:1px dashed var(--border-color);">
+                        <div class="field-row-block" style="margin-bottom:0;"><label>DOP Signature:</label><input type="text" placeholder="____________________________________________" disabled style="border:none;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- QUALITY GUIDE REFERENCE LEGEND -->
+        <div class="quality-guide-bar">
+            <span style="text-transform:uppercase; font-size:10px; letter-spacing:0.5px; color:var(--text-muted);">Take Quality Guide (For Reference)</span>
+            <div class="guide-item"><span class="dot-indicator" style="background-color:#2d5a27;"></span> Good Take</div>
+            <div class="guide-item"><span class="dot-indicator" style="background-color:#a0522d;"></span> Usable Take</div>
+            <div class="guide-item"><span class="dot-indicator" style="background-color:#7b1a1a;"></span> Bad Take</div>
+            <div class="guide-item"><span class="dot-indicator" style="background-color:#0f2c59;"></span> Pickup / Wild Track</div>
+        </div>
+
+        <!-- FOOTER: REMARKS FIELD & SUMMARY METRICS GRID -->
+        <div class="grid-row" style="border:none;">
+            <!-- Remarks Box -->
+            <div class="textarea-box-wrapper" style="flex:1.2; margin-right:5px;">
+                <div class="quad-card-header" style="text-align:left; padding-left:8px;">Additional Notes / Remarks</div>
+                <textarea id="additional-remarks-area" data-cam="textarea_block_remarks" style="height:90px;" placeholder="Add final post configurations notes, data logs variance, or scene continuation details here..."></textarea>
+            </div>
+
+            <!-- Summary Calculations Block Locked -->
+            <div class="summary-metrics-grid" style="flex:1.8; margin-left:5px;">
+                <div class="field-row-block"><label>Total Scenes Shot:</label><input type="text" data-cam="sum_total_scenes"></div>
+                <div class="field-row-block"><label>Total Shots:</label><input type="text" data-cam="sum_total_shots"></div>
+                <div class="field-row-block"><label>Total Good Takes:</label><input type="text" data-cam="sum_good_takes"></div>
+                <div class="field-row-block"><label>Total Usable Takes:</label><input type="text" data-cam="sum_usable_takes"></div>
+                <div class="field-row-block" style="margin-bottom:0;"><label>Total Bad Takes:</label><input type="text" data-cam="sum_bad_takes"></div>
+                <div class="field-row-block" style="margin-bottom:0;"><label>Total Pickups:</label><input type="text" data-cam="sum_total_pickups"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- PERSISTENT RECOVERY UTILITY SCRIPTS -->
+    <script>
+        const SYNC_MUTEX_GROUPS = [
+            ["filt_nd_yes", "filt_nd_no"],
+            ["filt_pol_yes", "filt_pol_no"],
+            ["snd_sync_yes", "snd_sync_no"],
+            ["bak_offload_yes", "bak_offload_no"]
+        ];
+
+        window.onload = function() {
+            instantiateBlankRows();
+            clearDocumentCanvas();
+            refreshDatabaseSelector();
+            setupCheckboxMutexLogic();
+        };
+
+        function instantiateBlankRows() {
+            const container = document.getElementById('log-table-rows-container');
+            container.innerHTML = '';
+            for (let i = 1; i <= 10; i++) {
+                const tr = document.createElement('tr');
+                tr.className = "log-data-row-node";
+                tr.innerHTML = `
+                    <td><input type="text" class="cell-scene"></td>
+                    <td><input type="text" class="cell-shot"></td>
+                    <td><input type="text" class="cell-take"></td>
+                    <td><input type="text" class="cell-slate"></td>
+                    <td><input type="text" class="cell-lens"></td>
+                    <td><input type="text" class="cell-focus"></td>
+                    <td><input type="text" class="cell-aperture"></td>
+                    <td><input type="text" class="cell-iso"></td>
+                    <td><input type="text" class="cell-shutter"></td>
+                    <td><input type="text" class="cell-wb"></td>
+                    <td style="text-align:left;"><input type="text" class="cell-file" style="text-align:left; padding-left:5px;"></td>
+                    <td><input type="text" class="cell-reel"></td>
+                    <td><input type="text" class="cell-tcin"></td>
+                    <td><input type="text" class="cell-tcout"></td>
+                    <td><input type="text" class="cell-goodtake"></td>
+                    <td><input type="text" class="cell-dirtake"></td>
+                    <td style="text-align:left;"><input type="text" class="cell-notes" style="text-align:left; padding-left:5px;"></td>
+                `;
+                container.appendChild(tr);
+            }
+        }
+
+        function clearDocumentCanvas() {
+            document.querySelectorAll('[data-cam]').forEach(input => input.value = '');
+            document.querySelectorAll('input[type="checkbox"]').forEach(box => box.checked = false);
+            document.querySelectorAll('.log-data-row-node input').forEach(input => input.value = '');
+        }
+
+        function setupCheckboxMutexLogic() {
+            SYNC_MUTEX_GROUPS.forEach(pair => {
+                const nodeA = document.getElementById(pair[0]);
+                const nodeB = document.getElementById(pair[1]);
+                if(nodeA && nodeB) {
+                    nodeA.addEventListener('change', () => { if(nodeA.checked) nodeB.checked = false; });
+                    nodeB.addEventListener('change', () => { if(nodeB.checked) nodeA.checked = false; });
+                }
+            });
+        }
+
+        function getStorageDatabase() {
+            const rawData = localStorage.getItem('invincible_camera_reports_v1');
+            return rawData ? JSON.parse(rawData) : {};
+        }
+
+        function refreshDatabaseSelector() {
+            const selector = document.getElementById('report-selector');
+            const database = getStorageDatabase();
+
+            selector.innerHTML = '<option value="default">-- Create Blank Report --</option>';
+            Object.keys(database).forEach(key => {
+                const option = document.createElement('option');
+                option.value = key;
+                option.textContent = key;
+                selector.appendChild(option);
+            });
+        }
+
+        function saveCameraReport() {
+            const profileName = document.getElementById('save-profile-input').value.trim();
+            if (!profileName) {
+                alert("Please declare a unique reference log profile name to save data.");
+                return;
+            }
+
+            const activeDataset = {
+                metadata: {},
+                checkboxes: {},
+                tableRows: []
+            };
+
+            document.querySelectorAll('[data-cam]').forEach(input => {
+                activeDataset.metadata[input.getAttribute('data-cam')] = input.value;
+            });
+
+            document.querySelectorAll('input[type="checkbox"]').forEach(box => {
+                activeDataset.checkboxes[box.id] = box.checked;
+            });
+
+            document.querySelectorAll('.log-data-row-node').forEach(row => {
+                activeDataset.tableRows.push({
+                    scene: row.querySelector('.cell-scene').value,
+                    shot: row.querySelector('.cell-shot').value,
+                    take: row.querySelector('.cell-take').value,
+                    slate: row.querySelector('.cell-slate').value,
+                    lens: row.querySelector('.cell-lens').value,
+                    focus: row.querySelector('.cell-focus').value,
+                    aperture: row.querySelector('.cell-aperture').value,
+                    iso: row.querySelector('.cell-iso').value,
+                    shutter: row.querySelector('.cell-shutter').value,
+                    wb: row.querySelector('.cell-wb').value,
+                    file: row.querySelector('.cell-file').value,
+                    reel: row.querySelector('.cell-reel').value,
+                    tcin: row.querySelector('.cell-tcin').value,
+                    tcout: row.querySelector('.cell-tcout').value,
+                    goodtake: row.querySelector('.cell-goodtake').value,
+                    dirtake: row.querySelector('.cell-dirtake').value,
+                    notes: row.querySelector('.cell-notes').value
+                });
+            });
+
+            const database = getStorageDatabase();
+            database[profileName] = activeDataset;
+            localStorage.setItem('invincible_camera_reports_v1', JSON.stringify(database));
+
+            refreshDatabaseSelector();
+            document.getElementById('report-selector').value = profileName;
+            alert(`"${profileName}" compiled successfully to secure local application cache.`);
+        }
+
+        function loadCameraReport() {
+            const targetKey = document.getElementById('report-selector').value;
+            if (targetKey === 'default') {
+                clearDocumentCanvas();
+                instantiateBlankRows();
+                document.getElementById('save-profile-input').value = '';
+                return;
+            }
+
+            const database = getStorageDatabase();
+            const config = database[targetKey];
+            if (!config) return;
+
+            document.getElementById('save-profile-input').value = targetKey;
+
+            Object.keys(config.metadata).forEach(key => {
+                const targetNode = document.querySelector(`[data-cam="${key}"]`);
+                if (targetNode) targetNode.value = config.metadata[key];
+            });
+
+            Object.keys(config.checkboxes).forEach(id => {
+                const targetNode = document.getElementById(id);
+                if (targetNode) targetNode.checked = config.checkboxes[id];
+            });
+
+            const container = document.getElementById('log-table-rows-container');
+            container.innerHTML = '';
+            config.tableRows.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.className = "log-data-row-node";
+                tr.innerHTML = `
+                    <td><input type="text" class="cell-scene" value="${row.scene || ''}"></td>
+                    <td><input type="text" class="cell-shot" value="${row.shot || ''}"></td>
+                    <td><input type="text" class="cell-take" value="${row.take || ''}"></td>
+                    <td><input type="text" class="cell-slate" value="${row.slate || ''}"></td>
+                    <td><input type="text" class="cell-lens" value="${row.lens || ''}"></td>
+                    <td><input type="text" class="cell-focus" value="${row.focus || ''}"></td>
+                    <td><input type="text" class="cell-aperture" value="${row.aperture || ''}"></td>
+                    <td><input type="text" class="cell-iso" value="${row.iso || ''}"></td>
+                    <td><input type="text" class="cell-shutter" value="${row.shutter || ''}"></td>
+                    <td><input type="text" class="cell-wb" value="${row.wb || ''}"></td>
+                    <td style="text-align:left;"><input type="text" class="cell-file" style="text-align:left; padding-left:5px;" value="${row.file || ''}"></td>
+                    <td><input type="text" class="cell-reel" value="${row.reel || ''}"></td>
+                    <td><input type="text" class="cell-tcin" value="${row.tcin || ''}"></td>
+                    <td><input type="text" class="cell-tcout" value="${row.tcout || ''}"></td>
+                    <td><input type="text" class="cell-goodtake" value="${row.goodtake || ''}"></td>
+                    <td><input type="text" class="cell-dirtake" value="${row.dirtake || ''}"></td>
+                    <td style="text-align:left;"><input type="text" class="cell-notes" style="text-align:left; padding-left:5px;" value="${row.notes || ''}"></td>
+                `;
+                container.appendChild(tr);
+            });
+        }
+
+        function deleteCameraProfile() {
+            const activeProfile = document.getElementById('report-selector').value;
+            if (activeProfile === 'default') return;
+
+            if (confirm(`Permanently erase camera report log configuration profile: "${activeProfile}"?`)) {
+                const database = getStorageDatabase();
+                delete database[activeProfile];
+                localStorage.setItem('invincible_camera_reports_v1', JSON.stringify(database));
+
+                document.getElementById('save-profile-input').value = '';
+                refreshDatabaseSelector();
+                clearDocumentCanvas();
+                instantiateBlankRows();
+            }
+        }
+    </script>
+</body>
+</html>

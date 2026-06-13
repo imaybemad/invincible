@@ -1,0 +1,258 @@
+<!DOCTYPE html><html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Production Budget Tracker</title><style>
+body {
+    margin:0;
+    font-family: Arial;
+    color:white;
+    background:
+    radial-gradient(circle at top left, rgba(229,9,20,0.25), transparent),
+    linear-gradient(to bottom, #000000, #0a0a0a);
+}
+
+/* NAVBAR */
+nav{
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+
+    padding:15px 25px;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.95), rgba(0,0,0,0.6));
+    
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    border-bottom: 1px solid rgba(255,0,0,0.3);
+}
+
+nav .title{
+    font-size:20px;
+    font-weight:bold;
+    color:#e50914;
+}
+
+nav a{
+    color:white;
+    text-decoration:none;
+    margin-left:20px;
+    font-size:16px;
+    transition:0.3s;
+}
+
+nav a:hover{
+    color:#e50914;
+}
+
+/* CONTAINER */
+.container{padding:20px;}
+
+/* FORM */
+.form{
+    display:grid;
+    grid-template-columns: repeat(auto-fit,minmax(150px,1fr));
+    gap:10px;
+}
+
+input, select{
+    padding:10px;
+    background:#111;
+    border:1px solid #333;
+    color:white;
+    border-radius:5px;
+}
+
+button{
+    background:#e50914;
+    border:none;
+    color:white;
+    padding:10px;
+    cursor:pointer;
+    border-radius:5px;
+}
+
+button:hover{
+    background:#b20710;
+}
+
+/* TABLE */
+table{
+    width:100%;
+    margin-top:20px;
+    border-collapse:collapse;
+}
+
+td, th{
+    padding:10px;
+    border-bottom:1px solid #333;
+    text-align:center;
+}
+
+tr:hover{
+    background: rgba(255,0,0,0.1);
+}
+
+/* SUMMARY */
+.summary{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:10px;
+    margin-top:20px;
+}
+
+.card{
+    background:#111;
+    padding:15px;
+    border-left:4px solid red;
+}
+</style></head><body><!-- NAVBAR --><nav>
+  <div>
+  <img src="Invinc.png" style="height:40px;">
+</div>
+  <div>
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="budget.html">Budget</a>
+  </div>
+</nav><div class="container"><h2>Production Budget Tracker</h2><div class="form">
+<input type="date" id="date">
+<input type="number" id="days" placeholder="No. of Days">
+<input type="text" id="desc" placeholder="Description">
+<input type="number" id="amount" placeholder="Amount ₹"><select id="category">
+<option>Cast</option>
+<option>Crew</option>
+<option>Location</option>
+<option>Equipment</option>
+<option>Food & Misc</option>
+</select><button onclick="add()">Add</button>
+<button onclick="exportPDF()">Export PDF</button>
+
+</div><table>
+<thead>
+<tr>
+<th>Date</th>
+<th>Days</th>
+<th>Description</th>
+<th>Category</th>
+<th>Amount</th>
+<th>Delete</th>
+</tr>
+</thead>
+<tbody id="table"></tbody>
+</table><div class="summary">
+<div class="card">🎬 Shooting Days: <span id="totalDays">0</span></div>
+<div class="card">🎭 Cast: ₹<span id="cast">0</span></div>
+<div class="card">👷 Crew: ₹<span id="crew">0</span></div>
+<div class="card">📍 Location: ₹<span id="location">0</span></div>
+<div class="card">🎥 Equipment: ₹<span id="equipment">0</span></div>
+<div class="card">🍽 Food & Misc: ₹<span id="misc">0</span></div>
+<div class="card"><b>💰 Total: ₹<span id="total">0</span></b></div>
+</div></div><script>
+let data = JSON.parse(localStorage.getItem("budgetData")) || [];
+
+function save(){
+    localStorage.setItem("budgetData", JSON.stringify(data));
+}
+
+function add(){
+    const entry = {
+        date: document.getElementById("date").value,
+        days: Number(document.getElementById("days").value) || 0,
+        desc: document.getElementById("desc").value,
+        amount: Number(document.getElementById("amount").value) || 0,
+        category: document.getElementById("category").value
+    };
+
+    if(!entry.date || !entry.amount){
+        alert("Please fill date and amount");
+        return;
+    }
+
+    data.push(entry);
+    save();
+    render();
+}
+
+function del(i){
+    data.splice(i,1);
+    save();
+    render();
+}
+
+function render(){
+    let html="";
+    let totals = {
+        Cast:0, Crew:0, Location:0, Equipment:0, "Food & Misc":0
+    };
+
+    let uniqueDays = new Set();
+    let totalAmount = 0;
+
+    data.forEach((e,i)=>{
+        html+=`
+        <tr>
+        <td>${e.date}</td>
+        <td>${e.days}</td>
+        <td>${e.desc}</td>
+        <td>${e.category}</td>
+        <td>₹${e.amount}</td>
+        <td><button onclick="del(${i})">X</button></td>
+        </tr>
+        `;
+
+        totals[e.category] += e.amount;
+        totalAmount += e.amount;
+
+        if(e.date) uniqueDays.add(e.date);
+    });
+
+    document.getElementById("table").innerHTML = html;
+
+    document.getElementById("totalDays").innerText = uniqueDays.size;
+    document.getElementById("cast").innerText = totals.Cast;
+    document.getElementById("crew").innerText = totals.Crew;
+    document.getElementById("location").innerText = totals.Location;
+    document.getElementById("equipment").innerText = totals.Equipment;
+    document.getElementById("misc").innerText = totals["Food & Misc"];
+    document.getElementById("total").innerText = totalAmount;
+}
+
+function exportPDF(){
+    let total = 0;
+
+    let win = window.open('', '', 'width=800,height=600');
+
+    let html = `
+    <h1>🎬 INVINCIBLE STUDIO</h1>
+    <h2>Production Budget Report</h2>
+    <table border="1" cellspacing="0" cellpadding="5" width="100%">
+    <tr>
+    <th>Date</th><th>Days</th><th>Description</th><th>Category</th><th>Amount</th>
+    </tr>
+    `;
+
+    data.forEach(e=>{
+        total += e.amount;
+
+        html+=`<tr>
+        <td>${e.date}</td>
+        <td>${e.days}</td>
+        <td>${e.desc}</td>
+        <td>${e.category}</td>
+        <td>₹${e.amount}</td>
+        </tr>`;
+    });
+
+    html+=`</table>
+    <br>
+    <h2>Total Budget: ₹${total}</h2>`;
+
+    win.document.write(html);
+    win.document.close();
+    win.print();
+}
+
+render();
+</script></body>
+</html>

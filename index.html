@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invincible Studio - Complete Production Gateway</title>
+    <style>
+        /* --- NETFLIX SYSTEM PREMIUM CUSTOM THEME PALETTES --- */
+        :root {
+            --bg-color: #141414;
+            --card-bg: rgba(31, 31, 31, 0.4);
+            --card-hover: rgba(45, 45, 45, 0.7);
+            --accent-red: #E50914;
+            --accent-glow: rgba(229, 9, 20, 0.4);
+            --text-color: #F5F5F7;
+            --text-muted: #bcbcbc;
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            /* Implements a rich cinematic Netflix theme red-to-black atmospheric background */
+            background: radial-gradient(circle at top center, #3d0306 0%, #180102 45%, #000000 100%);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Navbar Layout Configuration */
+        .navbar {
+            background-color: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: flex-end; /* Clean alignment tracking without Back link */
+            align-items: center;
+            padding: 20px 6%;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .navbar-nav {
+            list-style: none;
+            display: flex;
+            gap: 35px;
+        }
+
+        .navbar-nav a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            transition: color 0.3s ease;
+        }
+
+        .navbar-nav a:hover, .navbar-nav .active {
+            color: var(--accent-red);
+        }
+
+        /* Main Welcome Hero Presentation Basin */
+        .landing-hero-basin {
+            max-width: 1200px;
+            margin: auto;
+            width: 100%;
+            padding: 40px 4% 80px 4%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        /* Large Centered Premium Logo Matrix */
+        .main-hero-logo {
+            width: 100%;
+            max-width: 320px; /* Big size viewport tracking blueprint */
+            height: auto;
+            margin-bottom: 30px;
+            filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.8));
+            animation: logoEntranceGlow 1.2s ease-out;
+        }
+
+        .main-title-headline {
+            font-size: 38px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #ffffff;
+            margin-bottom: 15px;
+            text-shadow: 0 4px 15px rgba(0, 0, 0, 0.9);
+        }
+
+        .main-subtitle-caption {
+            font-size: 16px;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin-bottom: 60px;
+            line-height: 1.5;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Services Option Core Sections Title Line */
+        .services-divider-title {
+            font-size: 13px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: var(--accent-red);
+            margin-bottom: 30px;
+            position: relative;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .services-divider-title::before, .services-divider-title::after {
+            content: "";
+            height: 1px;
+            width: 60px;
+            background: linear-gradient(to right, transparent, var(--accent-red));
+        }
+        .services-divider-title::after {
+            background: linear-gradient(to left, transparent, var(--accent-red));
+        }
+
+        /* Services Dashboard Options Grid Split */
+        .services-options-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        /* Interactive Navigation Cards System */
+        .service-hub-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 45px 30px;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), 
+                        background-color 0.3s ease, 
+                        border-color 0.3s ease, 
+                        box-shadow 0.4s ease;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        }
+
+        .service-hub-card:hover {
+            transform: translateY(-8px) scale(1.03);
+            background-color: var(--card-hover);
+            border-color: var(--accent-red);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 30px var(--accent-glow);
+        }
+
+        /* Card Elements & Descriptions */
+        .card-vector-icon {
+            font-size: 52px;
+            margin-bottom: 22px;
+            transition: transform 0.3s ease;
+        }
+        
+        .service-hub-card:hover .card-vector-icon {
+            transform: scale(1.15);
+        }
+
+        .service-hub-card h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+            color: #ffffff;
+        }
+
+        .service-hub-card p {
+            font-size: 13.5px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .service-hub-card:active {
+            transform: translateY(-4px) scale(0.99);
+        }
+
+        /* Responsive Mobile Layout Resets */
+        @media (max-width: 850px) {
+            .services-options-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                max-width: 450px;
+            }
+            .main-title-headline {
+                font-size: 28px;
+            }
+            .main-hero-logo {
+                max-width: 240px;
+            }
+        }
+
+        /* Entry Keyframe Animations */
+        @keyframes logoEntranceGlow {
+            0% { opacity: 0; transform: scale(0.9) translateY(10px); filter: drop-shadow(0 0 0 transparent); }
+            100% { opacity: 1; transform: scale(1) translateY(0); filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.8)); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVIGATION BAR -->
+    <nav class="navbar">
+        <ul class="navbar-nav">
+            <li><a href="index.html" class="active">Home</a></li>
+            <li><a href="about.html">About</a></li>
+        </ul>
+    </nav>
+
+    <!-- CORE LANDING HERO Basin WRAPPER -->
+    <div class="landing-hero-basin">
+        
+        <!-- BIG SIZE TARGET BRANDING LOGO IMAGE -->
+        <img src="Invinc.png" alt="Invincible Studio Branding Logo" class="main-hero-logo">
+        
+        <!-- SUITABLE BOLD CORE SUB-HEADLINE -->
+        <h2 class="main-title-headline">Complete Production Website</h2>
+        <p class="main-subtitle-caption">Streamline creative operations, evaluate hardware inventory logistics, log supervisor continuation ledgers, and manage client master mastering releases entirely inside an unified operations desk environment.</p>
+        
+        <!-- SERVICES INTERACTIVE GRID OPTIONS PANEL -->
+        <div class="services-divider-title">Services</div>
+        
+        <div class="services-options-grid">
+            
+            <!-- SERVICE OPTION 1: Pre-production -->
+            <a href="pre.html" class="service-hub-card">
+                <div class="card-vector-icon">📝</div>
+                <h3>Pre-production</h3>
+                <p>Run cinematic script breakdowns, compile technical environment scouting checklists, and lock legal property release agreements.</p>
+            </a>
+
+            <!-- SERVICE OPTION 2: Production -->
+            <a href="production.html" class="service-hub-card">
+                <div class="card-vector-icon">🎥</div>
+                <h3>Production</h3>
+                <p>Monitor live camera configuration values, manage multitrack sound sheets metadata, and log script continuity files daily on set.</p>
+            </a>
+
+            <!-- SERVICE OPTION 3: Post-production -->
+            <a href="post.html" class="service-hub-card">
+                <div class="card-vector-icon">✂️</div>
+                <h3>Post-production</h3>
+                <p>Coordinate structural edit decision lists, assemble ADR audio replacement cues, audit VFX assets, and sign off master delivery reports.</p>
+            </a>
+
+        </div>
+    </div>
+
+</body>
+</html>

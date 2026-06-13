@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shot List Studio - Invinc</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        /* Netflix-inspired Dark Theme Variables */
+        :root {
+            --bg-color: #141414;
+            --nav-bg: #000000;
+            --card-bg: #181818;
+            --accent-color: #E50914;
+            --text-color: #FFFFFF;
+            --text-muted: #A3A3A3;
+            --border-color: #2F2F2F;
+            --input-focus: #404040;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Navigation Bar */
+        nav {
+            background-color: var(--nav-bg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 2%;
+            height: 60px;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            flex-shrink: 0;
+        }
+
+        .logo img {
+            height: 30px;
+            vertical-align: middle;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-color);
+        }
+
+        /* Split Screen Architecture */
+        .workspace-split {
+            display: flex;
+            flex: 1;
+            height: calc(100vh - 60px);
+            width: 100%;
+            overflow: hidden;
+        }
+
+        /* Left Side Panel: Document Reader Engine */
+        .panel-left {
+            width: 50%;
+            border-right: 2px solid var(--border-color);
+            background-color: #0c0c0c;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            background-color: var(--card-bg);
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+
+        .panel-title {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+            color: var(--text-color);
+        }
+
+        .pdf-uploader-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .pdf-scroll-view {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+            background-color: #111;
+        }
+
+        .pdf-page-wrapper {
+            background-color: var(--card-bg);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        canvas {
+            width: 100% !important;
+            height: auto !important;
+        }
+
+        /* Right Side Panel: Interactive Spreadsheet Matrix */
+        .panel-right {
+            width: 50%;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background-color: var(--bg-color);
+        }
+
+        .matrix-scroll-view {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* Reference Sheet Form Fields Layout */
+        .production-meta-box {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 1rem;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+
+        .meta-field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .meta-field label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        /* Shotlist Master Table */
+        .table-wrapper {
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+            background-color: var(--card-bg);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background-color: #0b0b0b;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            padding: 0.75rem;
+            border-bottom: 2px solid var(--border-color);
+            text-align: left;
+        }
+
+        td {
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.25rem;
+        }
+
+        /* Invisible input cells inside the table architecture */
+        .cell-input {
+            width: 100%;
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--text-color);
+            padding: 0.5rem;
+            font-size: 0.85rem;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .cell-input:focus {
+            background-color: var(--input-focus);
+            border-color: var(--accent-color);
+            outline: none;
+        }
+
+        /* Action Controls Layout */
+        .btn-action {
+            background-color: var(--accent-color);
+            color: #fff;
+            border: none;
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-action:hover { background-color: #B81D24; }
+        .btn-secondary { background-color: transparent; border: 1px solid var(--border-color); color: var(--text-muted); }
+        .btn-secondary:hover { background-color: var(--border-color); color: #fff; }
+        
+        .control-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input[type="text"] {
+            background-color: #222;
+            border: 1px solid var(--border-color);
+            color: #fff;
+            padding: 0.5rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+        input[type="text"]:focus { outline: 1px solid var(--accent-color); }
+        input[type="file"] { display: none; }
+
+        /* Responsive adaptation for narrow viewing frames */
+        @media (max-width: 1024px) {
+            .workspace-split { flex-direction: column; overflow-y: auto; }
+            .panel-left, .panel-right { width: 100%; height: 50vh; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">
+            <a href="index.html"><img src="Invinc.png" alt="Invinc Logo"></a>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="visual.html">Back</a></li>
+        </ul>
+    </nav>
+
+    <div class="workspace-split">
+        
+        <div class="panel-left">
+            <div class="panel-header">
+                <span class="panel-title" id="pdfNameDisplay">Script Engine Viewer</span>
+                <button class="btn-action btn-secondary" id="clearPdfBtn" style="display:none;">Clear File</button>
+            </div>
+            
+            <div class="pdf-uploader-area" id="uploadPromptBox">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><polyline points="9 15 12 12 15 15"></polyline></svg>
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin: 10px 0;">Inject production reference PDF layout</p>
+                <button class="btn-action" onclick="document.getElementById('pdfFileInput').click()">Upload Reference</button>
+                <input type="file" id="pdfFileInput" accept="application/pdf">
+            </div>
+
+            <div class="pdf-scroll-view" id="pdfCanvasContainer"></div>
+        </div>
+
+        <div class="panel-right">
+            <div class="panel-header">
+                <span class="panel-title">Interactive Shot Matrix</span>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn-action btn-secondary" onclick="clearAllDataGrid()">Reset List</button>
+                    <button class="btn-action" onclick="exportDataGridToPDF()">Export Document</button>
+                </div>
+            </div>
+
+            <div class="matrix-scroll-view">
+                <div class="production-meta-box">
+                    <div class="meta-field" style="grid-column: span 2;">
+                        <label>Project Title</label>
+                        <input type="text" id="meta-project-title" class="cell-input" style="background:#222; font-weight:bold;" placeholder="[PROJECT TITLE]">
+                    </div>
+                    <div class="meta-field">
+                        <label>Scene #</label>
+                        <input type="text" id="meta-scene" placeholder="e.g., 14">
+                    </div>
+                    <div class="meta-field">
+                        <label>Location context</label>
+                        <input type="text" id="meta-location" placeholder="e.g., INT. LAB - NIGHT">
+                    </div>
+                    <div class="meta-field" style="grid-column: span 2;">
+                        <label>Scene Description Summary</label>
+                        <input type="text" id="meta-desc" placeholder="Character triggers core actions...">
+                    </div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table id="shotlistMatrixTable">
+                        <thead>
+                            <tr>
+                                <th style="width: 10%;">Shot #</th>
+                                <th style="width: 10%;">Type</th>
+                                <th style="width: 15%;">Angle</th>
+                                <th style="width: 15%;">Motion</th>
+                                <th style="width: 20%;">Optics/Lens</th>
+                                <th style="width: 30%;">Action Context Details</th>
+                            </tr>
+                        </thead>
+                        <tbody id="matrixTableBody">
+                            </tbody>
+                    </table>
+                </div>
+
+                <div class="control-row">
+                    <button class="btn-action btn-secondary" onclick="insertMatrixRow()">+ Add Blank Shot Field</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Global Systems Configs
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+        const dbName = "InvincShotlistStudioDB";
+        const storeName = "workspaceData";
+        let db;
+
+        // DB Core System Initialization
+        const request = indexedDB.open(dbName, 1);
+        request.onupgradeneeded = e => {
+            let database = e.target.result;
+            if (!database.objectStoreNames.contains(storeName)) {
+                database.createObjectStore(storeName, { keyPath: "id" });
+            }
+        };
+        request.onsuccess = e => {
+            db = e.target.result;
+            loadWorkspaceState();
+        };
+
+        // DOM elements cache hooks
+        const pdfFileInput = document.getElementById('pdfFileInput');
+        const uploadPromptBox = document.getElementById('uploadPromptBox');
+        const pdfCanvasContainer = document.getElementById('pdfCanvasContainer');
+        const pdfNameDisplay = document.getElementById('pdfNameDisplay');
+        const clearPdfBtn = document.getElementById('clearPdfBtn');
+        const matrixTableBody = document.getElementById('matrixTableBody');
+
+        /* --- PDF Reader Core Engine --- */
+        pdfFileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file && file.type === "application/pdf") {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    const arrayBuffer = evt.target.result;
+                    saveDataToIndexedDB("cachedPdf", { name: file.name, buffer: arrayBuffer });
+                    renderPdfInline(arrayBuffer, file.name);
+                };
+                reader.readAsArrayBuffer(file);
+            }
+        });
+
+        async function renderPdfInline(arrayBuffer, fileName) {
+            pdfCanvasContainer.innerHTML = "";
+            pdfNameDisplay.textContent = fileName;
+            uploadPromptBox.style.display = 'none';
+            clearPdfBtn.style.display = 'block';
+            pdfCanvasContainer.style.display = 'flex';
+
+            try {
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+                    const page = await pdf.getPage(pageNum);
+                    const viewport = page.getViewport({ scale: 1.2 });
+                    
+                    const pageWrapper = document.createElement('div');
+                    pageWrapper.className = 'pdf-page-wrapper';
+                    
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+                    
+                    pageWrapper.appendChild(canvas);
+                    pdfCanvasContainer.appendChild(pageWrapper);
+                    await page.render({ canvasContext: context, viewport: viewport }).promise;
+                }
+            } catch (err) {
+                console.error("PDF engine crash: ", err);
+            }
+        }
+
+        clearPdfBtn.addEventListener('click', () => {
+            deleteDataFromIndexedDB("cachedPdf");
+            pdfCanvasContainer.innerHTML = "";
+            pdfFileInput.value = "";
+            pdfNameDisplay.textContent = "Script Engine Viewer";
+            clearPdfBtn.style.display = 'none';
+            pdfCanvasContainer.style.display = 'none';
+            uploadPromptBox.style.display = 'flex';
+        });
+
+
+        /* --- Interactive Matrix Spreadsheet Layout Core Engine --- */
+        const defaultHeaders = ["meta-project-title", "meta-scene", "meta-location", "meta-desc"];
+
+        function createRowElement(data = { shot: '', type: '', angle: '', motion: '', lenses: '', action: '' }) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><input type="text" class="cell-input shot-id-cell" value="${data.shot}" placeholder="14A" onchange="autoPreserveMatrixState()"></td>
+                <td><input type="text" class="cell-input" value="${data.type}" placeholder="WS" onchange="autoPreserveMatrixState()"></td>
+                <td><input type="text" class="cell-input" value="${data.angle}" placeholder="Eye Level" onchange="autoPreserveMatrixState()"></td>
+                <td><input type="text" class="cell-input" value="${data.motion}" placeholder="Static" onchange="autoPreserveMatrixState()"></td>
+                <td><input type="text" class="cell-input" value="${data.lenses}" placeholder="50mm Anamorphic" onchange="autoPreserveMatrixState()"></td>
+                <td><input type="text" class="cell-input" value="${data.action}" placeholder="Elara walks forward..." onchange="autoPreserveMatrixState()"></td>
+            `;
+            return tr;
+        }
+
+        function insertMatrixRow(data) {
+            matrixTableBody.appendChild(createRowElement(data));
+            autoPreserveMatrixState();
+        }
+
+        function clearAllDataGrid() {
+            if(confirm("Clear current matrix data parameters completely?")) {
+                defaultHeaders.forEach(id => document.getElementById(id).value = "");
+                matrixTableBody.innerHTML = "";
+                insertMatrixRow(); 
+                autoPreserveMatrixState();
+            }
+        }
+
+        function autoPreserveMatrixState() {
+            if(!db) return;
+            const rowsData = [];
+            const rows = matrixTableBody.querySelectorAll('tr');
+            rows.forEach(row => {
+                const inputs = row.querySelectorAll('input');
+                if(inputs.length >= 6) {
+                    rowsData.push({
+                        shot: inputs[0].value,
+                        type: inputs[1].value,
+                        angle: inputs[2].value,
+                        motion: inputs[3].value,
+                        lenses: inputs[4].value,
+                        action: inputs[5].value
+                    });
+                }
+            });
+
+            const statePayload = {
+                title: document.getElementById('meta-project-title').value,
+                scene: document.getElementById('meta-scene').value,
+                location: document.getElementById('meta-location').value,
+                desc: document.getElementById('meta-desc').value,
+                rows: rowsData
+            };
+            saveDataToIndexedDB("cachedTableGrid", statePayload);
+        }
+
+        // Event hooks for text inputs
+        defaultHeaders.forEach(id => {
+            document.getElementById(id).addEventListener('input', autoPreserveMatrixState);
+        });
+
+
+        /* --- Storage Preservation Pipeline Engine --- */
+        function saveDataToIndexedDB(key, val) {
+            if(!db) return;
+            const transaction = db.transaction([storeName], "readwrite");
+            transaction.objectStore(storeName).put({ id: key, payload: val });
+        }
+
+        function deleteDataFromIndexedDB(key) {
+            if(!db) return;
+            db.transaction([storeName], "readwrite").objectStore(storeName).delete(key);
+        }
+
+        function loadWorkspaceState() {
+            const transaction = db.transaction([storeName], "readonly");
+            const store = transaction.objectStore(storeName);
+
+            // Read PDF state
+            const pdfReq = store.get("cachedPdf");
+            pdfReq.onsuccess = () => {
+                if(pdfReq.result) {
+                    renderPdfInline(pdfReq.result.payload.buffer, pdfReq.result.payload.name);
+                }
+            };
+
+ // Read Matrix Grid layout parameters 
+            const matrixReq = store.get("cachedTableGrid");
+            matrixReq.onsuccess = () => {
+                if(matrixReq.result) {
+                    const data = matrixReq.result.payload;
+                    document.getElementById('meta-project-title').value = data.title || "";
+                    document.getElementById('meta-scene').value = data.scene || "";
+                    document.getElementById('meta-location').value = data.location || "";
+                    document.getElementById('meta-desc').value = data.desc || "";
+                    
+                    matrixTableBody.innerHTML = "";
+                    if(data.rows && data.rows.length > 0) {
+                        data.rows.forEach(rowData => insertMatrixRow(rowData));
+                    } else {
+                        insertMatrixRow();
+                    }
+                } else {
+                    insertMatrixRow(); // Initial dynamic row initialization
+                }
+            };
+        }
+
+        /* --- PDF Document Generation Engine --- */
+        function exportDataGridToPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'landscape' });
+
+            const pTitle = document.getElementById('meta-project-title').value || 'UNTITLED PRODUCTION';
+            const sceneNo = document.getElementById('meta-scene').value || '—';
+            const locationTxt = document.getElementById('meta-location').value || '—';
+            const sceneDesc = document.getElementById('meta-desc').value || '—';
+
+            // Top Header Styling 
+            doc.setFillColor(20, 20, 20);
+            doc.rect(0, 0, 297, 40, 'F');
+            
+            doc.setTextColor(229, 9, 20); // Bold Netflix Red Title Element Accent
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(20);
+            doc.text(pTitle.toUpperCase(), 14, 18);
+
+            doc.setTextColor(163, 163, 163);
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "normal");
+            doc.text(`SCENE: ${sceneNo}   |   LOCATION: ${locationTxt}   |   SUMMARY: ${sceneDesc}`, 14, 30);
+
+            // Row compilation loops
+            const tableDataElements = [];
+            const rows = matrixTableBody.querySelectorAll('tr');
+            rows.forEach(row => {
+                const inputs = row.querySelectorAll('input');
+                if(inputs.length >= 6 && (inputs[0].value || inputs[5].value)) {
+                    tableDataElements.push([
+                        inputs[0].value, inputs[1].value, inputs[2].value,
+                        inputs[3].value, inputs[4].value, inputs[5].value
+                    ]);
+                }
+            });
+
+            doc.autoTable({
+                startY: 48,
+                head: [['Shot #', 'Type', 'Angle', 'Movement', 'Equipment / Lens', 'Description / Action']],
+                body: tableDataElements,
+                headStyles: { fillColor: [0, 0, 0], textColor: [163, 163, 163], fontStyle: 'bold' },
+                styles: { cellPadding: 4, fontSize: 9, overflow: 'linebreak' },
+                columnStyles: { 0: { fontStyle: 'bold' } }
+            });
+
+            doc.save(`${pTitle.replace(/\s+/g, '_')}_Shotlist.pdf`);
+        }
+    </script>
+</body>
+</html>

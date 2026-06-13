@@ -1,0 +1,280 @@
+<!DOCTYPE html><html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pro Shooting Schedule</title><script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script><style>
+body{
+    margin:0;
+    font-family: Arial;
+    color:white;
+    background: linear-gradient(to bottom, #000, #111);
+}
+
+/* NAV */
+nav{
+    padding:15px 25px;
+    display:flex;
+    justify-content:space-between;
+    background:black;
+}
+
+nav a{
+    color:white;
+    margin-left:20px;
+    text-decoration:none;
+}
+
+/* SPLIT */
+.main{
+    display:flex;
+    height:calc(100vh - 60px);
+}
+
+/* LEFT PDF */
+.left{
+    width:50%;
+    overflow:auto;
+    background:#000;
+}
+
+canvas{
+    width:100%;
+    margin-bottom:10px;
+}
+
+/* RIGHT PANEL */
+.right{
+    width:50%;
+    padding:20px;
+    overflow:auto;
+}
+
+/* FORM */
+form{
+    background:#111;
+    padding:15px;
+    border-radius:10px;
+}
+
+input, select, textarea{
+    width:100%;
+    padding:10px;
+    margin-top:10px;
+    background:#222;
+    color:white;
+    border:none;
+}
+
+/* BUTTONS */
+button{
+    margin-top:10px;
+    padding:12px;
+    background:#e50914;
+    border:none;
+    color:white;
+    width:100%;
+    cursor:pointer;
+}
+
+/* ENTRY */
+.entry{
+    margin-top:10px;
+    padding:10px;
+    background:#1a1a1a;
+    border-left:4px solid red;
+    cursor:grab;
+}
+
+.entry small{
+    color:#aaa;
+}
+
+/* ACTIONS */
+.actions{
+    margin-top:5px;
+}
+
+.actions button{
+    width:auto;
+    margin-right:5px;
+    padding:5px 10px;
+}
+
+/* PRINT */
+#printArea{ display:none; }
+
+@media print{
+    body{ background:white; color:black; }
+    nav,.main{ display:none; }
+
+    #printArea{
+        display:block;
+        padding:40px;
+        font-size:14px;
+    }
+
+    h1{text-align:center;}
+}
+</style></head><body><nav>
+  <div>
+  <img src="Invinc.png" style="height:40px;">
+</div>
+<a href="index.html">Home</a>
+<a href="about.html">About</a>
+</div>
+</nav><div class="main"><!-- LEFT --><div class="left">
+<input type="file" accept="application/pdf" onchange="loadPDF(event)">
+<div id="pdfViewer"></div>
+</div><!-- RIGHT --><div class="right"><form onsubmit="addScene(event)">
+<select id="sceneType">
+<option>INT.</option>
+<option>EXT.</option>
+<option>INT./EXT.</option>
+</select><input type="text" id="sceneLocation" placeholder="Location Name" required><select id="sceneTime">
+<option>Day</option>
+<option>Afternoon</option>
+<option>Evening</option>
+<option>Night</option>
+<option>Dawn</option>
+<option>Dusk</option>
+</select><input type="date" id="sceneDate" required><textarea id="sceneDesc" placeholder="Description"></textarea><button type="submit">Add Scene</button>
+
+</form><button onclick="exportPDF()">Export PDF</button>
+
+<div id="sceneList"></div></div></div><div id="printArea"></div><script>
+let scenes = JSON.parse(localStorage.getItem("scenes") || "[]");
+
+/* RENDER */
+function render(){
+    const list = document.getElementById("sceneList");
+    list.innerHTML = "";
+
+    scenes.forEach((s,i)=>{
+        list.innerHTML += `
+        <div class="entry" draggable="true" ondragstart="dragStart(${i})">
+        <b>Scene ${i+1}: ${s.type} - ${s.location}</b><br>
+        <small>${s.time} | ${s.date}</small><br>
+        ${s.desc}
+
+        <div class="actions">
+            <button onclick="deleteScene(${i})">Delete</button>
+        </div>
+        </div>`;
+    });
+}
+render();
+
+/* ADD */
+function addScene(e){
+    e.preventDefault();
+
+    const data = {
+        type: document.getElementById("sceneType").value,
+        location: document.getElementById("sceneLocation").value,
+        time: document.getElementById("sceneTime").value,
+        date: document.getElementById("sceneDate").value,
+        desc: document.getElementById("sceneDesc").value
+    };
+
+    scenes.push(data);
+    save();
+    render();
+    e.target.reset();
+}
+
+/* DELETE */
+function deleteScene(i){
+    scenes.splice(i,1);
+    save();
+    render();
+}
+
+/* SAVE */
+function save(){
+    localStorage.setItem("scenes", JSON.stringify(scenes));
+}
+
+/* DRAG */
+let dragIndex;
+
+function dragStart(i){
+    dragIndex = i;
+}
+
+document.getElementById("sceneList").addEventListener("dragover", e=>{
+    e.preventDefault();
+});
+
+document.getElementById("sceneList").addEventListener("drop", e=>{
+    const target = e.target.closest(".entry");
+    if(!target) return;
+
+    const nodes = [...document.querySelectorAll(".entry")];
+    const dropIndex = nodes.indexOf(target);
+
+    const moved = scenes.splice(dragIndex,1)[0];
+    scenes.splice(dropIndex,0,moved);
+
+    save();
+    render();
+});
+
+/* PDF VIEW */
+function loadPDF(event){
+    const file = event.target.files[0];
+    const reader = new FileReader();
+
+    reader.onload = function(){
+        const typedarray = new Uint8Array(this.result);
+
+        pdfjsLib.getDocument(typedarray).promise.then(pdf=>{
+            const viewer = document.getElementById("pdfViewer");
+            viewer.innerHTML = "";
+
+            for(let i=1;i<=pdf.numPages;i++){
+                pdf.getPage(i).then(page=>{
+                    const canvas = document.createElement("canvas");
+                    const ctx = canvas.getContext("2d");
+                    const viewport = page.getViewport({scale:1.2});
+
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+
+                    page.render({canvasContext:ctx, viewport});
+                    viewer.appendChild(canvas);
+                });
+            }
+        });
+    };
+
+    reader.readAsArrayBuffer(file);
+}
+
+/* EXPORT PDF */
+function exportPDF(){
+    let html = `<h1>SHOOTING SCHEDULE</h1>`;
+
+    let grouped = {};
+
+    scenes.forEach(s=>{
+        if(!grouped[s.date]) grouped[s.date] = [];
+        grouped[s.date].push(s);
+    });
+
+    Object.keys(grouped).forEach(date=>{
+        html += `<h2>Date: ${date}</h2>`;
+
+        grouped[date].forEach((s,i)=>{
+            html += `
+            <p>
+            <b>Scene ${i+1}: ${s.type} - ${s.location}</b><br>
+            ${s.time}<br>
+            ${s.desc}
+            </p>`;
+        });
+    });
+
+    document.getElementById("printArea").innerHTML = html;
+    window.print();
+}
+</script></body>
+</html>

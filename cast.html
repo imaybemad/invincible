@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invincible Studio - Cast & Crew Hub</title>
+    <style>
+        /* --- NETFLIX DARK THEME UI STYLES --- */
+        :root {
+            --bg-color: #141414;
+            --card-bg: #1f1f1f;
+            --card-hover: #262626;
+            --accent-red: #E50914;
+            --text-color: #F5F5F7;
+            --text-muted: #808080;
+            --border-color: #333333;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navbar */
+        .navbar {
+            background-color: #000000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 4%;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 2px solid var(--accent-red);
+        }
+
+        .navbar-brand img {
+            height: 35px;
+            vertical-align: middle;
+        }
+
+        .navbar-nav {
+            list-style: none;
+            display: flex;
+            gap: 25px;
+        }
+
+        .navbar-nav a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .navbar-nav a:hover {
+            color: var(--accent-red);
+        }
+
+        /* Hub Container & Grid Layout */
+        .hub-container {
+            max-width: 1200px;
+            margin: auto;
+            width: 100%;
+            padding: 40px 4%;
+            text-align: center;
+        }
+
+        .hub-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .hub-subtitle {
+            color: var(--text-muted);
+            font-size: 16px;
+            margin-bottom: 40px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        /* Interactive Selection Cards */
+        .option-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 40px 30px;
+            cursor: pointer;
+            transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), background-color 0.2s, border-color 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .option-card:hover {
+            transform: scale(1.05);
+            background-color: var(--card-hover);
+            border-color: var(--accent-red);
+        }
+
+        /* Card Visual Accents */
+        .card-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            transition: transform 0.3s;
+        }
+        
+        .option-card:hover .card-icon {
+            transform: scale(1.1);
+        }
+
+        .option-card h3 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .option-card p {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .option-card:active {
+            transform: scale(0.98);
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a class="navbar-brand" href="index.html">
+            <img src="Invinc.png" alt="Invincible Studio">
+        </a>
+        <ul class="navbar-nav">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="pre.html">Back</a></li>
+        </ul>
+    </nav>
+
+    <div class="hub-container">
+        <h1 class="hub-title">Production Portal</h1>
+        <p class="hub-subtitle">Select a management environment configuration to modify roster files or system terms.</p>
+        
+        <div class="options-grid">
+            
+            <a href="cast-name.html" class="option-card">
+                <div class="card-icon">🎭</div>
+                <h3>Cast</h3>
+                <p>Manage talent profiles, headshots, contact information, character breakdowns, and individual call configurations.</p>
+            </a>
+
+            <a href="crew-name.html" class="option-card">
+                <div class="card-icon">🎬</div>
+                <h3>Crew</h3>
+                <p>Track department designations, assign tier levels, manage call allocations, and process crew unit directories.</p>
+            </a>
+
+            <a href="contract.html" class="option-card">
+                <div class="card-icon">📜</div>
+                <h3>Contracts & Agreement</h3>
+                <p>Review legal deal memos, enforce nondisclosure terms, execute structural release agreements, and track digital signatures.</p>
+            </a>
+
+        </div>
+    </div>
+
+</body>
+</html>

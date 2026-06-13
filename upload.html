@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Invincible Library</title><!-- PDF.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script><style>
+body {
+margin: 0;
+font-family: Arial;
+color: white;
+
+/* 🎬 NETFLIX STYLE BACKGROUND */
+background:
+radial-gradient(circle at top left, rgba(229,9,20,0.25), transparent 40%),
+radial-gradient(circle at bottom right, rgba(229,9,20,0.15), transparent 50%),
+linear-gradient(to bottom, #000000, #0a0a0a 60%, #000000);
+}
+
+/* NAVBAR WITH RED GLOW */
+.nav {
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 15px 20px;
+
+background: linear-gradient(
+to right,
+rgba(0,0,0,0.95),
+rgba(20,0,0,0.95),
+rgba(0,0,0,0.95)
+);
+
+box-shadow: 0 0 20px rgba(229, 9, 20, 0.3);
+}
+
+
+.nav img {
+  height: 30px;
+}
+
+.nav a {
+  color: white;
+  margin-left: 20px;
+  text-decoration: none;
+}
+
+/* GRID */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  padding: 20px;
+}
+
+.card:hover {
+  transform: scale(1.05);
+  transition: 0.3s;
+  box-shadow: 0 10px 25px rgba(229,9,20,0.4);
+}
+
+.card {
+  background: #111;
+  height: 180px;
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.add-card {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 50px;
+  cursor: pointer;
+  border: 2px dashed #444;
+}
+
+.delete {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: red;
+  padding: 5px;
+  cursor: pointer;
+}
+
+/* VIEWER */
+#viewer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: black;
+  overflow-y: scroll;
+  display: none;
+}
+
+#pdfContainer canvas {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+#closeBtn {
+  position: fixed;
+  top: 10px;
+  right: 15px;
+  font-size: 25px;
+  cursor: pointer;
+}
+</style></head><body><!-- NAVBAR --><div class="nav">
+  <img src="Invinc.png">
+  <div>
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+  </div>
+</div><!-- GRID --><div id="grid" class="grid"></div><input type="file" id="fileInput" accept="application/pdf" hidden><!-- VIEWER --><div id="viewer">
+  <div id="closeBtn">✖</div>
+  <div id="pdfContainer"></div>
+</div><script>
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+
+let db;
+
+/* DB INIT */
+const request = indexedDB.open("InvincibleDB", 1);
+
+request.onupgradeneeded = e => {
+  db = e.target.result;
+  db.createObjectStore("scripts", { keyPath: "id", autoIncrement: true });
+};
+
+request.onsuccess = e => {
+  db = e.target.result;
+  loadLibrary();
+};
+
+/* LOAD GRID */
+function loadLibrary() {
+  const grid = document.getElementById("grid");
+  grid.innerHTML = "";
+
+  /* ➕ ADD BUTTON */
+  const add = document.createElement("div");
+  add.className = "card add-card";
+  add.innerHTML = "+";
+  add.onclick = () => document.getElementById("fileInput").click();
+  grid.appendChild(add);
+
+  const tx = db.transaction("scripts", "readonly");
+  const store = tx.objectStore("scripts");
+
+  store.openCursor().onsuccess = e => {
+    const cursor = e.target.result;
+    if (cursor) {
+      const data = cursor.value;
+
+      const card = document.createElement("div");
+      card.className = "card";
+
+      const img = document.createElement("img");
+      img.src = data.thumb;
+
+      const del = document.createElement("div");
+      del.className = "delete";
+      del.innerHTML = "✖";
+
+      del.onclick = ev => {
+        ev.stopPropagation();
+        deleteScript(cursor.key);
+      };
+
+      card.onclick = () => openViewer(data.pdf);
+
+      card.appendChild(img);
+      card.appendChild(del);
+
+      grid.appendChild(card);
+
+      cursor.continue();
+    }
+  };
+}
+
+/* FILE TO BASE64 */
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+  });
+}
+
+/* UPLOAD */
+document.getElementById("fileInput").addEventListener("change", async e => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  if (file.type !== "application/pdf") {
+    alert("Only PDF allowed");
+    return;
+  }
+
+  if (file.size > 10 * 1024 * 1024) {
+    alert("Max 10MB allowed");
+    return;
+  }
+
+  const base64 = await fileToBase64(file);
+
+  let thumb = "https://dummyimage.com/200x300/111/fff&text=PDF";
+
+  try {
+    const pdf = await pdfjsLib.getDocument(base64).promise;
+    const page = await pdf.getPage(1);
+
+    const viewport = page.getViewport({ scale: 1 });
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+
+    await page.render({ canvasContext: ctx, viewport }).promise;
+
+    thumb = canvas.toDataURL();
+  } catch (err) {
+    console.warn("Thumbnail failed");
+  }
+
+  const tx = db.transaction("scripts", "readwrite");
+  tx.objectStore("scripts").add({
+    name: file.name,
+    pdf: base64,
+    thumb: thumb
+  });
+
+  tx.oncomplete = () => {
+    loadLibrary();
+    document.getElementById("fileInput").value = "";
+  };
+});
+
+/* VIEW PDF */
+async function openViewer(base64) {
+  const viewer = document.getElementById("viewer");
+  const container = document.getElementById("pdfContainer");
+
+  container.innerHTML = "";
+  viewer.style.display = "block";
+
+  try {
+    const pdf = await pdfjsLib.getDocument(base64).promise;
+
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const viewport = page.getViewport({ scale: 1.2 });
+
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+
+      await page.render({ canvasContext: ctx, viewport }).promise;
+
+      container.appendChild(canvas);
+    }
+
+  } catch (err) {
+    alert("Cannot open PDF");
+  }
+}
+
+/* CLOSE */
+document.getElementById("closeBtn").onclick = () => {
+  document.getElementById("viewer").style.display = "none";
+};
+
+/* DELETE */
+function deleteScript(id) {
+  const tx = db.transaction("scripts", "readwrite");
+  tx.objectStore("scripts").delete(id);
+  tx.oncomplete = loadLibrary;
+}
+</script></body>
+</html>

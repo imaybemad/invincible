@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Producer Declaration</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+/* =======================
+   NETFLIX STYLE BASE
+======================= */
+body {
+    margin: 0;
+    font-family: "Inter", sans-serif;
+    background: #141414;
+    color: #fff;
+}
+
+/* =======================
+   NAVBAR
+======================= */
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 25px;
+    background: rgba(0,0,0,0.9);
+    position: sticky;
+    top: 0;
+}
+
+.logo img {
+    height: 40px;
+}
+
+.nav-links a {
+    color: #fff;
+    text-decoration: none;
+    margin-left: 20px;
+    font-weight: 500;
+    transition: 0.3s;
+}
+
+.nav-links a:hover {
+    color: #e50914;
+}
+
+/* =======================
+   MAIN CONTAINER
+======================= */
+.container {
+    max-width: 900px;
+    margin: 30px auto;
+    background: #1c1c1c;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.6);
+}
+
+/* Stamp paper border effect */
+.stamp {
+    border: 2px solid #e50914;
+    padding: 25px;
+}
+
+/* Title */
+h1 {
+    text-align: center;
+    color: #e50914;
+    margin-bottom: 20px;
+    font-size: 24px;
+}
+
+/* Declaration text */
+p {
+    line-height: 1.7;
+    font-size: 14px;
+}
+
+/* Inputs */
+input, textarea {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #555;
+    color: #fff;
+    padding: 6px;
+    margin: 5px 0 15px 0;
+    outline: none;
+}
+
+textarea {
+    resize: none;
+}
+
+/* Signature section */
+.signature-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+/* Buttons */
+.btn {
+    margin-top: 20px;
+    padding: 10px 18px;
+    border: none;
+    background: #e50914;
+    color: white;
+    cursor: pointer;
+    font-weight: 600;
+    border-radius: 5px;
+}
+
+.btn:hover {
+    background: #b00610;
+}
+
+/* =======================
+   PRINT STYLES (IMPORTANT)
+======================= */
+@media print {
+    body {
+        background: white;
+        color: black;
+    }
+
+    .navbar, .btn {
+        display: none;
+    }
+
+    .container {
+        box-shadow: none;
+        background: white;
+        color: black;
+    }
+
+    input, textarea {
+        border-bottom: 1px solid #000;
+        color: black;
+    }
+
+    h1 {
+        color: black;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ================= NAVBAR ================= -->
+<div class="navbar">
+    <div class="logo">
+        <img src="Invinc.png" alt="Logo">
+    </div>
+
+    <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="budget.html">Budget</a>
+    </div>
+</div>
+
+<!-- ================= CONTENT ================= -->
+<div class="container">
+    <div class="stamp">
+
+        <h1>PRODUCER DECLARATION</h1>
+
+        <p>
+            This Producer Declaration is made on this day by the undersigned Producer in relation to the production
+            titled <input id="filmName" placeholder="[FILM / PROJECT NAME]">.
+        </p>
+
+        <p>
+            I, <input id="producerName" placeholder="[PRODUCER FULL NAME]">,
+            residing at <input id="address" placeholder="[ADDRESS]">,
+            do hereby solemnly affirm and declare as follows:
+        </p>
+
+        <p>
+            1. That I am the Producer of the above-mentioned film/project and hold full responsibility for its production,
+            financing, and execution.
+        </p>
+
+        <p>
+            2. That all rights, permissions, licenses, and clearances required for the production have been obtained and are valid.
+        </p>
+
+        <p>
+            3. That the content of the said film/project does not infringe upon any copyright, trademark, or intellectual property rights of any third party.
+        </p>
+
+        <p>
+            4. That I assume full legal, financial, and creative responsibility for all aspects of the production, including any disputes arising thereof.
+        </p>
+
+        <p>
+            5. That all cast, crew, and contributors engaged in the production have been engaged under proper agreements.
+        </p>
+
+        <p>
+            6. That this declaration is made for official, legal, and submission purposes and can be produced wherever required.
+        </p>
+
+        <p>
+            I hereby affirm that the above statements are true and correct to the best of my knowledge and belief.
+        </p>
+
+        <br>
+
+        <!-- ================= SIGNATURE ================= -->
+        <div class="signature-grid">
+            <div>
+                <label>Place</label>
+                <input id="place" placeholder="Enter Place">
+            </div>
+
+            <div>
+                <label>Date</label>
+                <input id="date" type="date">
+            </div>
+
+            <div>
+                <label>Signature of Producer</label>
+                <input placeholder="Sign here (digital/print)">
+            </div>
+
+            <div>
+                <label>Name</label>
+                <input id="finalName" placeholder="Producer Name">
+            </div>
+        </div>
+
+        <button class="btn" onclick="window.print()">Export / Print PDF</button>
+
+    </div>
+</div>
+
+<!-- ================= JS ================= -->
+<script>
+// auto-fill today's date
+window.onload = function () {
+    let today = new Date().toISOString().split('T')[0];
+    document.getElementById("date").value = today;
+}
+</script>
+
+</body>
+</html>

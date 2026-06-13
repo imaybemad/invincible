@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invincible Studio - Master Casting Sheet</title>
+    <style>
+        /* --- NETFLIX DARK THEME UI STYLES --- */
+        :root {
+            --bg-color: #141414;
+            --card-bg: #1f1f1f;
+            --accent-red: #E50914;
+            --text-color: #F5F5F7;
+            --text-muted: #808080;
+            --border-color: #333333;
+            --input-bg: #2b2b2b;
+            --table-blue: #1a5694;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding-bottom: 60px;
+        }
+
+        /* Navbar */
+        .navbar {
+            background-color: #000000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 4%;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 2px solid var(--accent-red);
+        }
+
+        .navbar-brand img {
+            height: 35px;
+            vertical-align: middle;
+        }
+
+        .navbar-nav {
+            list-style: none;
+            display: flex;
+            gap: 25px;
+        }
+
+        .navbar-nav a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .navbar-nav a:hover {
+            color: var(--accent-red);
+        }
+
+        /* Workspace Toolbar Controls */
+        .manager-bar {
+            max-width: 1200px;
+            margin: 20px auto;
+            background: var(--card-bg);
+            padding: 15px 20px;
+            border-radius: 6px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid var(--border-color);
+        }
+
+        .manager-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .manager-bar label {
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--text-muted);
+        }
+
+        select, input[type="text"].nav-input {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 8px 12px;
+            border-radius: 4px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        button {
+            background-color: var(--accent-red);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        button:hover {
+            background-color: #b80710;
+        }
+        
+        button:active {
+            transform: scale(0.98);
+        }
+
+        button.btn-secondary {
+            background-color: #444;
+        }
+        button.btn-secondary:hover {
+            background-color: #555;
+        }
+
+        /* --- CASTING WORKSPACE DOCUMENT --- */
+        .document-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            color: var(--text-color);
+            padding: 40px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        /* General Section Typography Rules */
+        .doc-main-title {
+            color: var(--accent-red);
+            font-size: 24px;
+            font-weight: 800;
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .doc-main-title input {
+            color: var(--text-color);
+            font-size: 24px;
+            font-weight: 800;
+            text-transform: uppercase;
+            width: 100%;
+            border: none;
+            background: transparent;
+            outline: none;
+        }
+
+        .section-divider-title {
+            color: var(--text-color);
+            font-size: 18px;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin: 30px 0 15px 0;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        /* Project Metadata Grid Block */
+        .metadata-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px 30px;
+            margin-bottom: 25px;
+        }
+
+        .meta-field {
+            display: flex;
+            align-items: center;
+            font-size: 15px;
+        }
+
+        .meta-field label {
+            font-weight: 800;
+            color: var(--text-muted);
+            margin-right: 6px;
+            white-space: nowrap;
+        }
+
+        .meta-field input {
+            border: none;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--input-bg);
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 14px;
+            color: var(--text-color);
+            width: 100%;
+            outline: none;
+        }
+
+        /* Master Cast Table Styling */
+        .cast-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .cast-table th {
+            background-color: #000000;
+            color: var(--text-color);
+            font-size: 15px;
+            font-weight: 800;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            text-align: left;
+        }
+
+        .cast-table th.char-header {
+            background-color: var(--table-blue);
+            color: #ffffff;
+            width: 30%;
+        }
+
+        .cast-table td {
+            border: 1px solid var(--border-color);
+            padding: 4px 8px;
+            vertical-align: middle;
+            background: var(--card-bg);
+        }
+
+        .cast-table td.char-cell {
+            background-color: rgba(26, 86, 148, 0.15);
+        }
+
+        .cast-table input {
+            width: 100%;
+            border: none;
+            background: transparent;
+            font-size: 14px;
+            padding: 6px;
+            color: var(--text-color);
+            outline: none;
+        }
+        
+        .cast-table td.char-cell input {
+            color: #6ba4e8;
+            font-weight: bold;
+        }
+
+        /* Detailed Character Breakdown Cards */
+        .breakdowns-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        .breakdown-card {
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 15px;
+            display: flex;
+            gap: 15px;
+            background: #181818;
+            position: relative;
+        }
+
+        .avatar-box {
+            width: 110px;
+            height: 130px;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .avatar-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .avatar-placeholder {
+            font-size: 24px;
+            color: var(--text-muted);
+        }
+
+        .avatar-upload-text {
+            font-size: 9px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            text-align: center;
+            padding: 4px;
+        }
+
+        .breakdown-content {
+            flex-grow: 1;
+        }
+
+        .breakdown-content input.char-title-input {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--text-color);
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            border: none;
+            border-bottom: 1px solid var(--border-color);
+            background: transparent;
+            width: 100%;
+            outline: none;
+            padding-bottom: 4px;
+        }
+
+        .breakdown-content textarea {
+            width: 100%;
+            height: 90px;
+            border: none;
+            background: transparent;
+            resize: none;
+            font-size: 13px;
+            line-height: 1.4;
+            color: var(--text-muted);
+            font-family: inherit;
+            outline: none;
+            padding-top: 4px;
+        }
+
+        .breakdown-content textarea:focus {
+            color: var(--text-color);
+        }
+
+        /* Row Configuration Modifiers */
+        .doc-action-row {
+            margin-top: 10px;
+            text-align: right;
+        }
+
+        .doc-action-row button {
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            padding: 6px 14px;
+            font-size: 12px;
+            color: var(--text-color);
+        }
+
+        .doc-action-row button:hover {
+            background-color: #333;
+        }
+
+        .delete-btn {
+            background: transparent;
+            color: var(--accent-red);
+            font-weight: bold;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            padding: 0 5px;
+        }
+        .delete-btn:hover {
+            color: #ff2e3a;
+            background: transparent;
+        }
+
+        /* --- EXTENSIVE PRINT EXPORT RE-CONFIGURATION --- */
+        @media print {
+            @page {
+                size: letter portrait;
+                margin: 0.5in;
+            }
+            body {
+                background: #ffffff !important;
+                color: #000000 !important;
+                padding-bottom: 0;
+            }
+            .navbar, .manager-bar, .doc-action-row, .delete-btn, .avatar-upload-text, button, .delete-btn-col {
+                display: none !important;
+            }
+            
+            /* Structural Conversion Back to Pure White Document Aesthetics */
+            .document-container {
+                max-width: 100%;
+                box-shadow: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                background: #ffffff !important;
+                color: #000000 !important;
+                border: none !important;
+            }
+            .doc-main-title {
+                color: #0c3c66 !important;
+                border-bottom: 2px solid #0c3c66 !important;
+            }
+            .doc-main-title input {
+                color: #0c3c66 !important;
+            }
+            .section-divider-title {
+                color: #0c3c66 !important;
+                border-bottom: 1px solid #c0c0c0 !important;
+            }
+            .meta-field label {
+                color: #000000 !important;
+            }
+            .meta-field input {
+                background: transparent !important;
+                color: #333333 !important;
+                border: none !important;
+                border-bottom: 1px dashed #888888 !important;
+                border-radius: 0 !important;
+                padding: 2px 0 !important;
+            }
+            .cast-table th {
+                background-color: #f2f2f2 !important;
+                color: #000000 !important;
+                border: 1px solid #c0c0c0 !important;
+            }
+            .cast-table th.char-header {
+                background-color: #2270c2 !important;
+                color: #ffffff !important;
+            }
+            .cast-table td {
+                border: 1px solid #c0c0c0 !important;
+                background: #ffffff !important;
+            }
+            .cast-table td.char-cell {
+                background-color: rgba(34, 112, 194, 0.08) !important;
+            }
+            .cast-table input {
+                color: #000000 !important;
+            }
+            .cast-table td.char-cell input {
+                color: #0c3c66 !important;
+            }
+            .breakdown-card {
+                background: #fafafa !important;
+                border: 1px solid #c0c0c0 !important;
+                page-break-inside: avoid;
+            }
+            .avatar-box {
+                background: #e0e0e0 !important;
+                border: 1px solid #b0b0b0 !important;
+            }
+            .avatar-placeholder {
+                color: #777777 !important;
+            }
+            .breakdown-content input.char-title-input {
+                color: #000000 !important;
+                border-bottom: 1px dashed #888888 !important;
+            }
+            .breakdown-content textarea {
+                color: #333333 !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a class="navbar-brand" href="index.html">
+            <img src="Invinc.png" alt="Invincible Studio">
+        </a>
+        <ul class="navbar-nav">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="cast.html">Back</a></li>
+        </ul>
+    </nav>
+
+    <div class="manager-bar">
+        <div class="manager-group">
+            <label for="cast-selector">Saved Casting Profiles:</label>
+            <select id="cast-selector" onchange="loadCastingSheet()">
+                <option value="default">-- Create Blank Profile --</option>
+            </select>
+            <button class="btn-secondary" onclick="deleteCastingProfile()">Delete Profile</button>
+        </div>
+        <div class="manager-group">
+            <input type="text" id="save-profile-input" class="nav-input" placeholder="Enter Profile Name...">
+            <button onclick="saveCastingSheet()">Save Roster</button>
+            <button onclick="window.print()">Export Document PDF</button>
+        </div>
+    </div>
+
+    <div class="document-container">
+        
+        <div class="doc-main-title">
+            <span>PROJECT TITLE:</span>
+            <input type="text" data-meta="project_title" placeholder="ENTER PROJECT NAME - CASTING ANNOUNCEMENT">
+        </div>
+
+        <div class="section-divider-title">Project Overview</div>
+        <div class="metadata-grid">
+            <div class="meta-field">
+                <label>Director:</label>
+                <input type="text" data-meta="director" placeholder="Enter Name">
+            </div>
+            <div class="meta-field">
+                <label>Genre:</label>
+                <input type="text" data-meta="genre" placeholder="Enter Genre">
+            </div>
+            <div class="meta-field">
+                <label>Casting Director:</label>
+                <input type="text" data-meta="casting_director" placeholder="Enter Name">
+            </div>
+            <div class="meta-field">
+                <label>Shoot Dates:</label>
+                <input type="text" data-meta="shoot_dates" placeholder="e.g. Oct 15 - Dec 10, 2026">
+            </div>
+        </div>
+
+        <div class="section-divider-title">Master Cast List</div>
+        <table class="cast-table" id="master-cast-table">
+            <thead>
+                <tr>
+                    <th class="char-header">Character Name</th>
+                    <th>Actor Name</th>
+                    <th>Role Type</th>
+                    <th style="width: 45px; text-align: center;" class="delete-btn-col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                </tbody>
+        </table>
+        <div class="doc-action-row">
+            <button type="button" onclick="addCastTableRow()">+ Add Cast Line Item</button>
+        </div>
+
+        <div class="section-divider-title">Detailed Character Breakdowns</div>
+        <div class="breakdowns-grid" id="breakdowns-wrapper">
+            </div>
+        <div class="doc-action-row">
+            <button type="button" onclick="addBreakdownCardRow()">+ Add Character Breakdown Card</button>
+        </div>
+
+    </div>
+
+<script>
+        window.onload = function() {
+            clearWorkspaceToDefault();
+            refreshProfileSelector();
+        };
+
+        function clearWorkspaceToDefault() {
+            // Empty textual nodes
+            document.querySelectorAll('[data-meta]').forEach(el => el.value = '');
+
+            // Build fresh initial line structures without default text values
+            const tableBody = document.querySelector('#master-cast-table tbody');
+            tableBody.innerHTML = '';
+            for(let i=0; i<3; i++) { addCastTableRow(); }
+
+            const breakdownWrapper = document.getElementById('breakdowns-wrapper');
+            breakdownWrapper.innerHTML = '';
+            for(let i=0; i<2; i++) { addBreakdownCardRow(); }
+        }
+
+        function addCastTableRow(charVal = '', actorVal = '', roleVal = '') {
+            const tbody = document.querySelector('#master-cast-table tbody');
+            const tr = document.createElement('tr');
+            tr.className = "cast-row-item";
+            tr.innerHTML = `
+                <td class="char-cell"><input type="text" class="inp-char" value="${charVal}" placeholder="e.g. 1. ELARA VANCE"></td>
+                <td><input type="text" class="inp-actor" value="${actorVal}" placeholder="Actor Name"></td>
+                <td><input type="text" class="inp-role" value="${roleVal}" placeholder="Role Type"></td>
+                <td style="text-align:center;" class="delete-btn-col"><button type="button" class="delete-btn" onclick="this.closest('tr').remove()">×</button></td>
+            `;
+            tbody.appendChild(tr);
+        }
+
+        function addBreakdownCardRow(titleVal = '', textVal = '', imageSrc = '') {
+            const wrapper = document.getElementById('breakdowns-wrapper');
+            const card = document.createElement('div');
+            card.className = "breakdown-card";
+            
+            const imageTemplate = imageSrc 
+                ? `<img src="${imageSrc}" alt="Avatar">` 
+                : `<div class="avatar-placeholder">👤</div><div class="avatar-upload-text">Click to load photo</div>`;
+
+            card.innerHTML = `
+                <div class="avatar-box" onclick="triggerImageUpload(this)">
+                    ${imageTemplate}
+                    <input type="file" accept="image/*" style="display:none;" onchange="handleImageFile(this)">
+                </div>
+                <div class="breakdown-content">
+                    <input type="text" class="char-title-input" value="${titleVal}" placeholder="CHARACTER NAME...">
+                    <textarea placeholder="Enter custom character parameters, insights, or descriptions here...">${textVal}</textarea>
+                </div>
+                <button type="button" class="delete-btn" style="position:absolute; top:8px; right:8px;" onclick="this.closest('.breakdown-card').remove()">×</button>
+            `;
+            wrapper.appendChild(card);
+        }
+
+        function triggerImageUpload(avatarBox) {
+            avatarBox.querySelector('input[type="file"]').click();
+        }
+
+        function handleImageFile(fileInput) {
+            const file = fileInput.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const box = fileInput.closest('.avatar-box');
+                box.innerHTML = `<img src="${e.target.result}" alt="Talent Profile"><input type="file" accept="image/*" style="display:none;" onchange="handleImageFile(this)">`;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        /* --- DATABASE CONFIG LOCAL STORAGE MOTORS --- */
+        function getStorageDatabase() {
+            const database = localStorage.getItem('invincible_casting_v2');
+            return database ? JSON.parse(database) : {};
+        }
+
+        function refreshProfileSelector() {
+            const selector = document.getElementById('cast-selector');
+            const db = getStorageDatabase();
+
+            selector.innerHTML = '<option value="default">-- Create Blank Profile --</option>';
+            Object.keys(db).forEach(profileKey => {
+                const opt = document.createElement('option');
+                opt.value = profileKey;
+                opt.textContent = profileKey;
+                selector.appendChild(opt);
+            });
+        }
+
+        function saveCastingSheet() {
+            const profileName = document.getElementById('save-profile-input').value.trim();
+            if (!profileName) {
+                alert("Please declare a unique casting roster configuration name to store data.");
+                return;
+            }
+
+            const schemaDataset = {
+                meta: {},
+                tableData: [],
+                cardsData: []
+            };
+
+            document.querySelectorAll('[data-meta]').forEach(input => {
+                schemaDataset.meta[input.getAttribute('data-meta')] = input.value;
+            });
+
+            document.querySelectorAll('.cast-row-item').forEach(row => {
+                schemaDataset.tableData.push({
+                    char: row.querySelector('.inp-char').value,
+                    actor: row.querySelector('.inp-actor').value,
+                    role: row.querySelector('.inp-role').value
+                });
+            });
+
+            document.querySelectorAll('.breakdown-card').forEach(card => {
+                const imgNode = card.querySelector('.avatar-box img');
+                const base64Data = imgNode ? imgNode.src : '';
+
+                schemaDataset.cardsData.push({
+                    title: card.querySelector('.char-title-input').value,
+                    desc: card.querySelector('textarea').value,
+                    imgData: base64Data
+                });
+            });
+
+            const targetDb = getStorageDatabase();
+            targetDb[profileName] = schemaDataset;
+            localStorage.setItem('invincible_casting_v2', JSON.stringify(targetDb));
+
+            refreshProfileSelector();
+            document.getElementById('cast-selector').value = profileName;
+            alert(`"${profileName}" compiled successfully to local application storage cache.`);
+        }
+
+        function loadCastingSheet() {
+            const selectedKey = document.getElementById('cast-selector').value;
+            if (selectedKey === 'default') {
+                clearWorkspaceToDefault();
+                document.getElementById('save-profile-input').value = '';
+                return;
+            }
+
+            const db = getStorageDatabase();
+            const config = db[selectedKey];
+            if (!config) return;
+
+            document.getElementById('save-profile-input').value = selectedKey;
+
+            Object.keys(config.meta).forEach(key => {
+                const targetingInput = document.querySelector(`[data-meta="${key}"]`);
+                if (targetingInput) targetingInput.value = config.meta[key];
+            });
+
+            const tableBody = document.querySelector('#master-cast-table tbody');
+            tableBody.innerHTML = '';
+            config.tableData.forEach(row => {
+                addCastTableRow(row.char, row.actor, row.role);
+            });
+
+            const breakdownWrapper = document.getElementById('breakdowns-wrapper');
+            breakdownWrapper.innerHTML = '';
+            config.cardsData.forEach(card => {
+                addBreakdownCardRow(card.title, card.desc, card.imgData);
+            });
+        }
+
+        function deleteCastingProfile() {
+            const profilingSelector = document.getElementById('cast-selector').value;
+            if (profilingSelector === 'default') return;
+
+            if (confirm(`Erase structural profile configuration directory: "${profilingSelector}"?`)) {
+                const db = getStorageDatabase();
+                delete db[profilingSelector];
+                localStorage.setItem('invincible_casting_v2', JSON.stringify(db));
+
+                document.getElementById('save-profile-input').value = '';
+                refreshProfileSelector();
+                clearWorkspaceToDefault();
+            }
+        }
+    </script>
+</body>
+</html>

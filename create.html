@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Invincible Studio</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+body {
+  margin:0;
+  font-family:Arial;
+  color:white;
+  /* NETFLIX STYLE GRADIENT */
+  background: radial-gradient(circle at center, #1a0000 0%, #000000 70%);
+}
+
+/* NAVBAR */
+.navbar {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:rgba(0,0,0,0.8);
+  padding:10px 20px;
+  backdrop-filter: blur(5px);
+}
+
+.logo {
+  display:flex;
+  align-items:center;
+}
+
+.logo img {
+  height:40px;
+  margin-right:10px;
+}
+
+.nav-links a {
+  margin-left:20px;
+  cursor:pointer;
+  text-decoration:none;
+  color:white;
+}
+
+.nav-links a:hover { color:red; }
+
+/* TOOLBAR */
+.toolbar {
+  padding:10px;
+  background:rgba(0,0,0,0.85);
+}
+
+button, select {
+  margin:5px;
+  padding:8px;
+  background:#222;
+  color:white;
+  border:none;
+  cursor:pointer;
+}
+
+button:hover { background:red; }
+.btn-accent { background: #441111; border: 1px solid red; }
+
+/* PAPER */
+.paper {
+  width:210mm;
+  min-height:297mm;
+  margin:20px auto;
+  background:white;
+  color:black;
+  padding-top:25mm;
+  padding-bottom:25mm;
+  font-family:"Courier New", monospace;
+  font-size:14px;
+  box-sizing: border-box;
+}
+
+/* TITLE PAGE STYLING */
+.title-page-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 240mm; /* Fills roughly one full A4 sheet area */
+  padding: 20mm;
+  box-sizing: border-box;
+  border-bottom: 2px dashed #ccc;
+  margin-bottom: 30mm;
+}
+
+.title-center-block {
+  margin-top: auto;
+  margin-bottom: auto;
+  text-align: center;
+}
+
+.script-title {
+  font-size: 28px;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-bottom: 15px;
+  outline: none;
+}
+
+.script-by {
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.script-author {
+  font-size: 16px;
+  outline: none;
+}
+
+.title-bottom-block {
+  text-align: left;
+  margin-top: auto;
+  font-size: 14px;
+  outline: none;
+  white-space: pre-line;
+}
+
+/* LINE */
+.line {
+  outline:none;
+  white-space:pre-wrap;
+  min-height:20px;
+}
+
+/* FORMATS */
+.slug {
+  margin-left:1.5in;
+  margin-right:1in;
+  text-transform:uppercase;
+  font-weight: bold;
+}
+
+.action {
+  margin-left:1.5in;
+  margin-right:1in;
+}
+
+.character {
+  margin-left:3.7in;
+  text-transform:uppercase;
+}
+
+.dialogue {
+  margin-left:2.5in;
+  margin-right:2.5in;
+}
+
+.parenthetical {
+  margin-left:3.1in;
+  margin-right:2.7in;
+}
+
+.transition {
+  text-align:right;
+  margin-right:1in;
+  text-transform:uppercase;
+}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+  <div class="logo">
+    <img src="Invinc.png" alt="Logo">
+  </div>  
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+  </div>
+</div>
+
+<!-- TOOLBAR -->
+<div class="toolbar">  
+  <!-- FILE BUTTONS -->
+  <button onclick="saveScript()">Save</button>
+  <button onclick="saveAs()">Save As</button>
+  <button onclick="openScript()">Open</button>
+  <button onclick="newScript()">New Script</button>
+  <button onclick="exportPDF()">Export PDF</button>
+  <button onclick="toggleTitlePage()" class="btn-accent">Add/Remove Title Page</button>
+
+  <br>  
+  <!-- EDITOR BUTTONS -->
+  <button onclick="addLine('slug')">Slug Line</button>
+  <button onclick="addLine('action')">Action</button>
+  <button onclick="addLine('character')">Character</button>
+  <button onclick="addLine('dialogue')">Dialogue</button>
+  <button onclick="addLine('parenthetical')">Parenthetical</button>
+  <button onclick="addLine('transition')">Transition</button>
+
+  <!-- OPTIONS -->  
+  <select id="slugType">
+    <option>INT.</option>
+    <option>EXT.</option>
+    <option>INT./EXT.</option>
+  </select>  
+  <select id="transitionType">
+    <option>CUT TO:</option>
+    <option>FADE IN:</option>
+    <option>FADE OUT:</option>
+    <option>MATCH CUT:</option>
+    <option>CUT TO BLACK:</option>
+  </select>
+</div>
+
+<!-- EDITOR -->
+<div class="paper" id="paper"></div>
+
+<script>
+const paper = document.getElementById("paper");
+
+/* TOGGLE TITLE PAGE FUNCTION */
+function toggleTitlePage() {
+  let titlePage = paper.querySelector(".title-page-container");
+  
+  if (titlePage) {
+    if (confirm("Remove the title page? This will clear title information.")) {
+      titlePage.remove();
+    }
+  } else {
+    titlePage = document.createElement("div");
+    titlePage.classList.add("title-page-container");
+    titlePage.contentEditable = false; // Container shouldn't accept raw layout keystrokes
+    
+    titlePage.innerHTML = `
+      <div class="title-center-block">
+        <div class="script-title" contenteditable="true">TITLE OF SCRIPT</div>
+        <div class="script-by">written by</div>
+        <div class="script-author" contenteditable="true">Your Name</div>
+      </div>
+      <div class="title-bottom-block" contenteditable="true">Contact Info:\nYour Email\nPhone Number</div>
+    `;
+    
+    // Insert title block explicitly at the absolute top of the paper
+    paper.insertBefore(titlePage, paper.firstChild);
+    titlePage.querySelector(".script-title").focus();
+  }
+}
+
+/* HELPER TO ATTACH EVENT LISTENERS TO LINES */
+function attachLineEvents(line) {
+  line.addEventListener("keydown", function(e) {
+    
+    /* 1. ENTER KEY: MOVE FORWARD */
+    if (e.key === "Enter") {
+      e.preventDefault();
+
+      let next = "action";
+      if (line.classList.contains("character")) next = "dialogue";
+      else if (line.classList.contains("dialogue")) next = "action";
+
+      addLineAfter(line, next);
+    }
+
+    /* 2. BACKSPACE KEY: SMOOTH ERASING / MOVE BACKWARD */
+    if (e.key === "Backspace") {
+      const selection = window.getSelection();
+      
+      if (selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
+        
+        if (range.startOffset === 0 && range.endOffset === 0) {
+          e.preventDefault();
+          
+          const prevLine = line.previousElementSibling;
+          
+          // Ensure we don't accidentally pull text inside the title block container structure
+          if (prevLine && prevLine.classList.contains("line")) {
+            const prevLength = prevLine.innerText.length;
+            
+            if (line.innerText.trim() !== "") {
+              prevLine.innerText += line.innerText;
+            }
+            
+            line.remove();
+            prevLine.focus();
+            
+            const newRange = document.createRange();
+            const newSel = window.getSelection();
+            
+            if (prevLine.childNodes.length > 0) {
+              let targetNode = prevLine.childNodes[0];
+              newRange.setStart(targetNode, Math.min(prevLength, targetNode.length));
+              newRange.collapse(true);
+              newSel.removeAllRanges();
+              newSel.addRange(newRange);
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+/* ADD LINE AT THE VERY END */
+function addLine(type){
+  const line = document.createElement("div");
+  line.classList.add("line", type);
+  line.contentEditable = true;
+
+  setDefaultText(line, type);
+  attachLineEvents(line);
+
+  paper.appendChild(line);
+  line.focus();
+  moveCursorToEnd(line);
+}
+
+/* ADD LINE INTERNALLY (Mid-script processing) */
+function addLineAfter(currentLine, type) {
+  const line = document.createElement("div");
+  line.classList.add("line", type);
+  line.contentEditable = true;
+
+  setDefaultText(line, type);
+  attachLineEvents(line);
+
+  currentLine.insertAdjacentElement('afterend', line);
+  line.focus();
+  moveCursorToEnd(line);
+}
+
+function setDefaultText(line, type) {
+  if(type === "slug") line.innerText = document.getElementById("slugType").value + " ";
+  else if(type === "transition") line.innerText = document.getElementById("transitionType").value;
+  else if(type === "parenthetical") line.innerText = "(";
+  else line.innerText = "";
+}
+
+function moveCursorToEnd(line) {
+  if (line.childNodes.length === 0) return;
+  const range = document.createRange();
+  const sel = window.getSelection();
+  range.selectNodeContents(line);
+  range.collapse(false);
+  sel.removeAllRanges();
+  sel.addRange(range);
+}
+
+/* SAVE (HTML Structure tracking saves Title Page metadata perfectly) */
+function saveScript(){
+  localStorage.setItem("script", paper.innerHTML);
+  alert("Saved successfully!");
+}
+
+/* SAVE AS */
+function saveAs(){
+  let name = prompt("File name:");
+  if(name){
+    localStorage.setItem("script_" + name, paper.innerHTML);
+    alert("Saved as " + name);
+  }
+}
+
+/* OPEN */
+function openScript(){
+  let name = prompt("File name to open:");
+  if(name){
+    const savedContent = localStorage.getItem("script_" + name);
+    if(savedContent !== null) {
+      paper.innerHTML = savedContent;
+      const lines = paper.getElementsByClassName("line");
+      for(let line of lines) {
+        attachLineEvents(line);
+      }
+    } else {
+      alert("File not found.");
+    }
+  }
+}
+
+/* NEW */
+function newScript(){
+  if(confirm("Are you sure you want to start a new script?")){
+    paper.innerHTML = "";
+  }
+}
+
+/* PDF EXPORT (With Clean Title Page support built-in) */
+function exportPDF(){
+  const { jsPDF } = window.jspdf;
+  let doc = new jsPDF('p', 'mm', 'a4');
+  
+  doc.setFont("courier", "normal");
+  let y = 25;
+  const pageHeight = 297;
+
+  // 1. GENERATE TITLE PAGE FIRST IF EXISTS
+  const titlePage = paper.querySelector(".title-page-container");
+  if (titlePage) {
+    const title = titlePage.querySelector(".script-title").innerText;
+    const author = titlePage.querySelector(".script-author").innerText;
+    const contact = titlePage.querySelector(".title-bottom-block").innerText;
+
+    // Center Title (Roughly midway down screen)
+    doc.setFontSize(22);
+    doc.setFont("courier", "bold");
+    doc.text(title.toUpperCase(), 105, 110, { align: "center" });
+    
+    doc.setFontSize(12);
+    doc.setFont("courier", "normal");
+    doc.text("written by", 105, 122, { align: "center" });
+    
+    doc.setFontSize(14);
+    doc.text(author, 105, 132, { align: "center" });
+
+    // Contact bottom block left alignment
+    doc.setFontSize(11);
+    let splitContact = doc.splitTextToSize(contact, 100);
+    doc.text(splitContact, 38.1, 240);
+
+    // Create script content page breakthrough
+    doc.addPage();
+  }
+
+  // 2. GENERATE COMPONENT SCRIPT ENTRIES
+  doc.setFont("courier", "normal");
+  doc.setFontSize(12);
+  const lines = paper.getElementsByClassName("line");
+
+  for (let i = 0; i < lines.length; i++) {
+    let text = lines[i].innerText;
+    let type = lines[i].classList[1];
+    
+    let x = 38.1; 
+    let width = 140;
+
+    if (type === "character") { x = 94; width = 100; }
+    else if (type === "dialogue") { x = 63.5; width = 89; }
+    else if (type === "parenthetical") { x = 78.7; width = 68; }
+    else if (type === "transition") { x = 140; width = 38; }
+
+    let splitText = doc.splitTextToSize(text, width);
+    
+    if (y + (splitText.length * 5) > pageHeight - 25) {
+      doc.addPage();
+      y = 25;
+    }
+
+    if (type === "slug") {
+      doc.setFont("courier", "bold");
+    } else {
+      doc.setFont("courier", "normal");
+    }
+
+    doc.text(splitText, x, y);
+    y += (splitText.length * 5) + 2;
+  }
+
+  doc.save("script.pdf");
+}
+</script>
+
+</body>
+</html>

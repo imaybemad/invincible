@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pitch - Invinc</title>
+    <!-- Include PDF.js Library from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <style>
+        /* Netflix-inspired Dark Theme Variables */
+        :root {
+            --bg-color: #141414;
+            --nav-bg: #000000;
+            --card-bg: #181818;
+            --accent-color: #E50914;
+            --text-color: #FFFFFF;
+            --text-muted: #A3A3A3;
+            --border-color: #2F2F2F;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Navigation Bar */
+        nav {
+            background-color: var(--nav-bg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 4%;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .logo img {
+            height: 35px;
+            vertical-align: middle;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-color);
+        }
+
+        /* Main Content Container */
+        main {
+            flex: 1;
+            padding: 2rem 4%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        /* Upload Area */
+        .upload-section {
+            background-color: var(--card-bg);
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 2.5rem;
+            text-align: center;
+            width: 100%;
+            max-width: 600px;
+            transition: border-color 0.3s ease;
+            margin-top: 2rem;
+        }
+
+        .upload-section:hover {
+            border-color: var(--accent-color);
+        }
+
+        .upload-btn {
+            background-color: var(--accent-color);
+            color: var(--text-color);
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: transform 0.2s ease, background-color 0.2s ease;
+        }
+
+        .upload-btn:hover {
+            background-color: #B81D24;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        /* PDF Viewer Controls & Area */
+        .viewer-header {
+            width: 100%;
+            max-width: 800px;
+            display: none;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--card-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .file-info {
+            font-size: 1rem;
+            font-weight: 500;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 60%;
+        }
+
+        .delete-btn {
+            background-color: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .delete-btn:hover {
+            background-color: var(--accent-color);
+            color: var(--text-color);
+            border-color: var(--accent-color);
+        }
+
+        /* Continuous Vertical Scroll Container */
+        .pdf-scroll-container {
+            width: 100%;
+            max-width: 800px;
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+            padding-bottom: 3rem;
+        }
+
+        /* Individual page styling */
+        .pdf-page-wrapper {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        canvas {
+            display: block;
+            width: 100% !important; /* Forces responsiveness on narrow mobile screens */
+            height: auto !important;
+        }
+
+        .loading-text {
+            color: var(--accent-color);
+            font-weight: bold;
+            text-align: center;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <nav>
+        <div class="logo">
+            <a href="index.html">
+                <img src="Invinc.png" alt="Invinc Logo">
+            </a>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="visual.html">Back</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Workspace -->
+    <main>
+        <!-- File Drop/Upload Area -->
+        <div id="uploadBox" class="upload-section">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#A3A3A3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+            <p style="margin-top: 1rem; color: var(--text-muted);">Upload your pitch deck PDF to view it right here.</p>
+            <button class="upload-btn" onclick="document.getElementById('fileInput').click()">Choose PDF</button>
+            <input type="file" id="fileInput" accept="application/pdf">
+        </div>
+
+        <div id="loadingStatus" class="loading-text">Rendering Document Pages...</div>
+
+        <!-- Viewer Controls Header -->
+        <div id="viewerHeader" class="viewer-header">
+            <span id="fileName" class="file-info">Document.pdf</span>
+            <button class="delete-btn" id="deleteBtn">Delete from Storage</button>
+        </div>
+
+        <!-- Dynamic Page Container (Scrollable like a presentation) -->
+        <div id="pdfContainer" class="pdf-scroll-container"></div>
+    </main>
+
+    <script>
+        // Configure PDF.js Worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+
+        const dbName = "InvincPitchDB";
+        const storeName = "pdfs";
+        let db;
+
+        // Initialize IndexedDB database 
+        const request = indexedDB.open(dbName, 1);
+
+        request.onupgradeneeded = function(e) {
+            db = e.target.result;
+            if (!db.objectStoreNames.contains(storeName)) {
+                db.createObjectStore(storeName, { keyPath: "id" });
+            }
+        };
+
+        request.onsuccess = function(e) {
+            db = e.target.result;
+            checkForStoredPDF();
+        };
+
+        request.onerror = function(e) {
+            console.error("IndexedDB Setup Error:", e.target.errorCode);
+        };
+
+        const fileInput = document.getElementById('fileInput');
+        const uploadBox = document.getElementById('uploadBox');
+        const viewerHeader = document.getElementById('viewerHeader');
+        const pdfContainer = document.getElementById('pdfContainer');
+        const fileNameSpan = document.getElementById('fileName');
+        const deleteBtn = document.getElementById('deleteBtn');
+        const loadingStatus = document.getElementById('loadingStatus');
+
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file && file.type === "application/pdf") {
+                saveAndDisplayPDF(file);
+            } else {
+                alert("Please select a valid PDF file.");
+            }
+        });
+
+        // Convert file to binary array buffer and save to mobile local IndexedDB storage
+        function saveAndDisplayPDF(file) {
+            loadingStatus.style.display = 'block';
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const arrayBuffer = e.target.result;
+                
+                const transaction = db.transaction([storeName], "readwrite");
+                const store = transaction.objectStore(storeName);
+                
+                const pdfData = {
+                    id: "currentDeck",
+                    name: file.name,
+                    data: arrayBuffer
+                };
+
+                store.put(pdfData);
+                transaction.oncomplete = function() {
+                    renderPDFCanvas(arrayBuffer, file.name);
+                };
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        // Auto-fetch data if it exists locally on browser startup
+        function checkForStoredPDF() {
+            const transaction = db.transaction([storeName], "readonly");
+            const store = transaction.objectStore(storeName);
+            const getRequest = store.get("currentDeck");
+
+            getRequest.onsuccess = function() {
+                if (getRequest.result) {
+                    loadingStatus.style.display = 'block';
+                    renderPDFCanvas(getRequest.result.data, getRequest.result.name);
+                }
+            };
+        }
+
+        // The Engine: Manually parses the PDF layout data and prints it onto the UI
+        async function renderPDFCanvas(arrayBuffer, name) {
+            try {
+                // Clear out any old canvas instances
+                pdfContainer.innerHTML = "";
+                fileNameSpan.textContent = name;
+
+                // Load document object model
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                
+                // Render every individual page sequentially inside the dark view wrap
+                for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+                    const page = await pdf.getPage(pageNum);
+                    
+                    // Set up scale adjustments optimal for standard mobile widths
+                    const viewport = page.getViewport({ scale: 1.5 });
+                    
+                    // Create card wrap for the current page slide
+                    const pageWrapper = document.createElement('div');
+                    pageWrapper.className = 'pdf-page-wrapper';
+                    
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+                    
+                    pageWrapper.appendChild(canvas);
+                    pdfContainer.appendChild(pageWrapper);
+
+                    const renderContext = {
+                        canvasContext: context,
+                        viewport: viewport
+                    };
+                    await page.render(renderContext).promise;
+                }
+
+                // Adjust layout visibility toggles
+                loadingStatus.style.display = 'none';
+                uploadBox.classList.add('hidden');
+                viewerHeader.style.display = 'flex';
+                pdfContainer.style.display = 'flex';
+
+            } catch (error) {
+                console.error("Error drawing PDF via Canvas context: ", error);
+                loadingStatus.style.display = 'none';
+                alert("Failed to render the document structure inline.");
+            }
+        }
+
+        // Delete completely from hardware storage
+        deleteBtn.addEventListener('click', function() {
+            const transaction = db.transaction([storeName], "readwrite");
+            const store = transaction.objectStore(storeName);
+            store.delete("currentDeck");
+
+            transaction.oncomplete = function() {
+                pdfContainer.innerHTML = "";
+                fileInput.value = "";
+                viewerHeader.style.display = 'none';
+                pdfContainer.style.display = 'none';
+                uploadBox.classList.remove('hidden');
+            };
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Scripting - Invincible Studio</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to right, #000000, #8B0000);
+    color: white;
+}
+
+/* NAVBAR */
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 40px;
+    background: rgba(0,0,0,0.8);
+}
+
+.logo img {
+    height: 50px;
+}
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    margin-left: 25px;
+    font-size: 18px;
+    transition: 0.3s;
+}
+
+.nav-links a:hover {
+    color: red;
+}
+
+/* HERO */
+.hero {
+    text-align: center;
+    padding: 80px 20px;
+}
+
+.hero h1 {
+    font-size: 50px;
+    margin-bottom: 10px;
+}
+
+.hero p {
+    font-size: 18px;
+    color: #ccc;
+}
+
+/* OPTIONS */
+.options {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-top: 60px;
+    flex-wrap: wrap;
+}
+
+.card {
+    background: rgba(255, 0, 0, 0.1);
+    border: 1px solid red;
+    padding: 40px;
+    width: 260px;
+    text-align: center;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: scale(1.05);
+    background: rgba(255,0,0,0.3);
+}
+
+.card h2 {
+    margin-bottom: 10px;
+}
+
+.card p {
+    font-size: 14px;
+    color: #ccc;
+}
+</style>
+
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<nav>
+    <div class="logo">
+        <img src="Invinc.png"> <!-- your company logo -->
+    </div>
+
+    <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="pre.html">Services</a>
+    </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+    <h1>SCRIPTING</h1>
+    <p>Create, manage and protect your stories</p>
+</section>
+
+<!-- OPTIONS -->
+<section class="options">
+
+    <!-- CREATE SCRIPT -->
+    <div class="card" onclick="goToCreate()">
+        <h2>Create Script</h2>
+        <p>Write your screenplay with auto-saving editor</p>
+    </div>
+
+    <!-- UPLOAD SCRIPT -->
+    <div class="card" onclick="goToUpload()">
+        <h2>Script Library</h2>
+        <p>Upload and read you script</p>
+    </div>
+
+    <!-- REGISTER SCRIPT -->
+    <div class="card" onclick="registerScript()">
+        <h2>Register Script</h2>
+        <p>Secure your work officially</p>
+    </div>
+
+</section>
+
+<script>
+
+/* NAVIGATION */
+function goToCreate() {
+    window.location.href = "create.html";
+}
+
+function goToUpload() {
+    window.location.href = "upload.html";
+}
+
+/* EXTERNAL LINK */
+function registerScript() {
+    window.open("https://www.swaindia.org/", "_blank");
+}
+
+</script>
+
+</body>
+</html>

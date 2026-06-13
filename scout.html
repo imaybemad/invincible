@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invincible Studio - Tech Scouting Checklist</title>
+    <style>
+        /* --- NETFLIX DARK THEME UI STYLES --- */
+        :root {
+            --bg-color: #141414;
+            --card-bg: #1f1f1f;
+            --accent-red: #E50914;
+            --text-color: #F5F5F7;
+            --text-muted: #808080;
+            --border-color: #333333;
+            --input-bg: #2b2b2b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding-bottom: 60px;
+        }
+
+        /* Navbar Layout */
+        .navbar {
+            background-color: #000000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 4%;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 2px solid var(--accent-red);
+        }
+
+        .navbar-brand img {
+            height: 35px;
+            vertical-align: middle;
+        }
+
+        .navbar-nav {
+            list-style: none;
+            display: flex;
+            gap: 25px;
+        }
+
+        .navbar-nav a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .navbar-nav a:hover {
+            color: var(--accent-red);
+        }
+
+        /* Workspace Controls Toolbar */
+        .manager-bar {
+            max-width: 900px;
+            margin: 20px auto;
+            background: var(--card-bg);
+            padding: 15px 20px;
+            border-radius: 6px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid var(--border-color);
+        }
+
+        .manager-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .manager-bar label {
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--text-muted);
+        }
+
+        select, input[type="text"].nav-input {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 8px 12px;
+            border-radius: 4px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        button {
+            background-color: var(--accent-red);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        button:hover {
+            background-color: #b80710;
+        }
+        
+        button:active {
+            transform: scale(0.98);
+        }
+
+        button.btn-secondary {
+            background-color: #444;
+        }
+        button.btn-secondary:hover {
+            background-color: #555;
+        }
+
+        /* --- CHECKLIST DOCUMENT CONTAINER --- */
+        .document-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            color: var(--text-color);
+            padding: 50px 60px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Document Header titles */
+        .doc-header-block {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .doc-header-block h1 {
+            font-size: 28px;
+            font-weight: 400;
+            color: var(--text-color);
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .doc-header-block h2 {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 8px;
+        }
+
+        .doc-header-block p {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Core Section Grid Divisions */
+        .checklist-section {
+            margin-bottom: 35px;
+        }
+
+        .section-title-strip {
+            display: flex;
+            align-items: center;
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 6px;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+
+        .section-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px 40px;
+            margin-bottom: 15px;
+        }
+
+        /* Checkbox Row Items Layout */
+        .checkbox-row {
+            display: flex;
+            align-items: flex-start;
+            cursor: pointer;
+            position: relative;
+        }
+
+        /* Style custom checkboxes to match the circular checklist icons */
+        .checkbox-row input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+            outline: none;
+            background-color: var(--input-bg);
+            cursor: pointer;
+            flex-shrink: 0;
+            margin-right: 14px;
+            margin-top: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: border-color 0.2s, background-color 0.2s;
+        }
+
+        .checkbox-row input[type="checkbox"]:checked {
+            border-color: var(--accent-red);
+            background-color: var(--accent-red);
+        }
+
+        .checkbox-row input[type="checkbox"]:checked::after {
+            content: "✓";
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .item-text-content {
+            font-size: 14px;
+            line-height: 1.4;
+            color: var(--text-color);
+        }
+
+        .item-text-content strong {
+            font-weight: 700;
+        }
+
+        .item-text-content span {
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        /* Notes Box Fields */
+        .notes-area-wrapper {
+            margin-top: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background: rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .notes-area-wrapper label {
+            position: absolute;
+            top: -10px;
+            left: 12px;
+            background-color: var(--card-bg);
+            padding: 0 6px;
+            font-size: 11px;
+            font-weight: bold;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .notes-area-wrapper textarea {
+            width: 100%;
+            height: 75px;
+            background: transparent;
+            border: none;
+            resize: none;
+            outline: none;
+            color: var(--text-color);
+            font-size: 13px;
+            padding: 12px;
+            font-family: inherit;
+        }
+
+        /* --- CLEAN PRINT ENGINE SPECIFICATIONS --- */
+        @media print {
+            @page {
+                size: letter portrait;
+                margin: 0.5in;
+            }
+            body {
+                background: #ffffff !important;
+                color: #000000 !important;
+                padding-bottom: 0;
+            }
+            .navbar, .manager-bar, button {
+                display: none !important;
+            }
+            
+            /* Flip style layout vectors to match classic light sheets */
+            .document-container {
+                max-width: 100%;
+                box-shadow: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                background: #ffffff !important;
+                color: #000000 !important;
+                border: none !important;
+            }
+            .doc-header-block h1, .doc-header-block h2 {
+                color: #333333 !important;
+            }
+            .doc-header-block p {
+                color: #666666 !important;
+            }
+            .section-title-strip {
+                color: #333333 !important;
+                border-bottom: 1.5px solid #333333 !important;
+            }
+            .checkbox-row input[type="checkbox"] {
+                border: 1.5px solid #333333 !important;
+                background-color: transparent !important;
+            }
+            .checkbox-row input[type="checkbox"]:checked {
+                background-color: #000000 !important;
+                border-color: #000000 !important;
+            }
+            .checkbox-row input[type="checkbox"]:checked::after {
+                color: #ffffff !important;
+            }
+            .item-text-content {
+                color: #111111 !important;
+            }
+            .item-text-content span {
+                color: #555555 !important;
+            }
+            .notes-area-wrapper {
+                border: 1px solid #777777 !important;
+                background: transparent !important;
+            }
+            .notes-area-wrapper label {
+                background-color: #ffffff !important;
+                color: #444444 !important;
+            }
+            .notes-area-wrapper textarea {
+                color: #000000 !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a class="navbar-brand" href="index.html">
+            <img src="Invinc.png" alt="Invincible Studio Logo">
+        </a>
+        <ul class="navbar-nav">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="location.html">Back</a></li>
+        </ul>
+    </nav>
+
+    <div class="manager-bar">
+        <div class="manager-group">
+            <label for="profile-selector">Saved Reports:</label>
+            <select id="profile-selector" onchange="loadScoutReport()">
+                <option value="default">-- Create Blank Report --</option>
+            </select>
+            <button class="btn-secondary" onclick="deleteScoutProfile()">Delete Report</button>
+        </div>
+        <div class="manager-group">
+            <input type="text" id="save-profile-input" class="nav-input" placeholder="Location/Scene Name...">
+            <button onclick="saveScoutReport()">Save Report</button>
+            <button onclick="window.print()">Export PDF</button>
+        </div>
+    </div>
+
+    <div class="document-container">
+        
+        <div class="doc-header-block">
+            <h1>Shooting Location</h1>
+            <h2>Tech Scouting Checklist</h2>
+            <p>Made by Invincible Studio</p>
+        </div>
+
+        <div class="checklist-section">
+            <div class="section-title-strip">
+                <span>📖</span> Story
+            </div>
+            <div class="section-grid">
+                <label class="checkbox-row">
+                    <input type="checkbox" id="chk-storytelling">
+                    <div class="item-text-content">
+                        <strong>Storytelling:</strong> <span>Does the location meet the scene requirements, and fit the director's tone?</span>
+                    </div>
+                </label>
+                <label class="checkbox-row">
+                    <input type="checkbox" id="chk-anachronisms">
+                    <div class="item-text-content">
+                        <strong>Anachronisms:</strong> <span>Does the setting fit the time period and story setting?</span>
+                    </div>
+                </label>
+            </div>
+            <div class="notes-area-wrapper">
+                <label>Notes</label>
+                <textarea id="notes-story" placeholder="Enter storyline alignment parameters or environmental context..."></textarea>
+            </div>
+        </div>
+
+        <div class="checklist-section">
+            <div class="section-title-strip">
+                <span>👁️</span> Sight
+            </div>
+            <div class="section-grid">
+                <label class="checkbox-row">
+                    <input type="checkbox" id="chk-wide-shot">
+                    <div class="item-text-content">
+                        <strong>Wide Shot Test:</strong> <span>Is a wide frame acceptable? Any problematic visual elements in the frame?</span>
+                    </div>
+                </label>
+                <label class="checkbox-row">
+                    <input type="checkbox" id="chk-indoor-staging">
+                    <div class="item-text-content">
+                        <strong>Indoor Staging:</strong> <span>Does your cast, crew and gear fit inside? Any special production design needs?</span>
+                    </div>
+                </label>
+                <label class="checkbox-row">
+                    <input type="checkbox" id="chk-360-test">
+                    <div class="item-text-content">
+                        <strong>360 Test:</strong> <span>Are there any problematic directions that should be avoided?</span>
+                    </div>
+                </label>
+                <label class="checkbox-row">
+                    <input type="checkbox" id="chk-sunlight">
+                    <div class="item-text-content">
+                        <strong>Sunlight:</strong> <span>Any sunlight considerations? In the morning? Noon? Afternoon? Evening?</span>
+                    </div>
+                </label>
+                <label class="checkbox-row">
+                    <input type="checkbox" id="chk-clearance">
+                    <div class="item-text-content">
+                        <strong>Commercial Clearance:</strong> <span>Any properties that require commercial clearance?</span>
+                    </div>
+                </label>
+                <label class="checkbox-row">
+                    <input type="checkbox" id="chk-vfx-needs">
+                    <div class="item-text-content">
+                        <strong>VFX Needs:</strong> <span>Would anything need to be removed or added in post?</span>
+                    </div>
+                </label>
+            </div>
+            <div class="notes-area-wrapper">
+                <label>Notes</label>
+                <textarea id="notes-sight" placeholder="Enter framing variables, lighting patterns, or lens requirements..."></textarea>
+            </div>
+        </div>
+
+        <div class="checklist-section">
+            <div class="section-title-strip">
+                <span>🔊</span> Sound
+            </div>
+            <div class="section-grid">
+                <label class="checkbox-row">
+                    <input type="checkbox" id="chk-hvac">
+                    <div class="item-text-content">
+                        <strong>HVAC:</strong> <span>Can you turn off heating, ventilation and air conditioning units?</span>
+                    </div>
+                </label>
+                <label class="checkbox-row">
+                    <input type="checkbox" id="chk-reverberation">
+                    <div class="item-text-content">
+                        <strong>Reverberation:</strong> <span>Can you record clean dialogue? Do you need to dampen echoes in the space?</span>
+                    </div>
+                </label>
+                <label class="checkbox-row">
+                    <input type="checkbox" id="chk-refrigerators">
+                    <div class="item-text-content">
+                        <strong>Refrigerators:</strong> <span>Can you turn off any noisy appliances or refrigerators?</span>
+                    </div>
+                </label>
+            </div>
+            <div class="notes-area-wrapper">
+                <label>Notes</label>
+                <textarea id="notes-sound" placeholder="Enter sound bleed updates, echo treatment details, or acoustics parameters..."></textarea>
+            </div>
+        </div>
+
+    </div>
+
+<script>
+        window.onload = function() {
+            clearChecklistCanvas();
+            refreshProfileSelector();
+        };
+
+        function clearChecklistCanvas() {
+            // Uncheck checkboxes
+            document.querySelectorAll('input[type="checkbox"]').forEach(box => box.checked = false);
+            // Empty all comment nodes
+            document.querySelectorAll('textarea').forEach(area => area.value = '');
+        }
+
+        /* --- DATA ATTACHMENT CORE LOCAL STORAGE MOTORS --- */
+        function getStorageDatabase() {
+            const rawData = localStorage.getItem('invincible_scout_reports_v1');
+            return rawData ? JSON.parse(rawData) : {};
+        }
+
+        function refreshProfileSelector() {
+            const selector = document.getElementById('profile-selector');
+            const db = getStorageDatabase();
+
+            selector.innerHTML = '<option value="default">-- Create Blank Report --</option>';
+            Object.keys(db).forEach(key => {
+                const opt = document.createElement('option');
+                opt.value = key;
+                opt.textContent = key;
+                selector.appendChild(opt);
+            });
+        }
+
+        function saveScoutReport() {
+            const profileName = document.getElementById('save-profile-input').value.trim();
+            if (!profileName) {
+                alert("Please declare a unique reference configuration profile name to save this scouting layout.");
+                return;
+            }
+
+            const activeDataset = {
+                checkboxes: {},
+                notes: {}
+            };
+
+            // Grab configurations for checkbox items
+            document.querySelectorAll('input[type="checkbox"]').forEach(box => {
+                activeDataset.checkboxes[box.id] = box.checked;
+            });
+
+            // Grab variables inside text blocks
+            document.querySelectorAll('textarea').forEach(area => {
+                activeDataset.notes[area.id] = area.value;
+            });
+
+            const database = getStorageDatabase();
+            database[profileName] = activeDataset;
+            localStorage.setItem('invincible_scout_reports_v1', JSON.stringify(database));
+
+            refreshProfileSelector();
+            document.getElementById('profile-selector').value = profileName;
+            alert(`"${profileName}" compiled successfully to local application storage cache.`);
+        }
+
+        function loadScoutReport() {
+            const selectedKey = document.getElementById('profile-selector').value;
+            if (selectedKey === 'default') {
+                clearChecklistCanvas();
+                document.getElementById('save-profile-input').value = '';
+                return;
+            }
+
+            const database = getStorageDatabase();
+            const config = database[selectedKey];
+            if (!config) return;
+
+            document.getElementById('save-profile-input').value = selectedKey;
+
+            // Map checkbox allocations safely
+            Object.keys(config.checkboxes).forEach(id => {
+                const targetNode = document.getElementById(id);
+                if (targetNode) targetNode.checked = config.checkboxes[id];
+            });
+
+            // Map comment nodes safely
+            Object.keys(config.notes).forEach(id => {
+                const targetNode = document.getElementById(id);
+                if (targetNode) targetNode.value = config.notes[id];
+            });
+        }
+
+        function deleteScoutProfile() {
+            const activeKey = document.getElementById('profile-selector').value;
+            if (activeKey === 'default') return;
+
+            if (confirm(`Are you certain you want to erase stored data configurations for report: "${activeKey}"?`)) {
+                const database = getStorageDatabase();
+                delete database[activeKey];
+                localStorage.setItem('invincible_scout_reports_v1', JSON.stringify(database));
+
+                document.getElementById('save-profile-input').value = '';
+                refreshProfileSelector();
+                clearChecklistCanvas();
+            }
+        }
+    </script>
+</body>
+</html>

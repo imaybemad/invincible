@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invincible Studio - Script Supervisor Notes</title>
+    <style>
+        /* --- NETFLIX DARK THEME UI STYLES --- */
+        :root {
+            --bg-color: #141414;
+            --card-bg: #1f1f1f;
+            --accent-red: #E50914;
+            --text-color: #F5F5F7;
+            --text-muted: #808080;
+            --border-color: #333333;
+            --input-bg: #2b2b2b;
+            
+            /* Section Headers Grouping Colors */
+            --header-dark: #111111;
+            --cell-bg-dark: #161616;
+            --cell-input-bg: #222222;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding-bottom: 60px;
+        }
+
+        /* Navbar Layout */
+        .navbar {
+            background-color: #000000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 4%;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 2px solid var(--accent-red);
+        }
+
+        .navbar-brand img {
+            height: 35px;
+            vertical-align: middle;
+        }
+
+        .navbar-nav {
+            list-style: none;
+            display: flex;
+            gap: 25px;
+        }
+
+        .navbar-nav a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .navbar-nav a:hover {
+            color: var(--accent-red);
+        }
+
+        /* Workspace Controls Toolbar */
+        .manager-bar {
+            max-width: 1300px;
+            margin: 20px auto;
+            background: var(--card-bg);
+            padding: 15px 20px;
+            border-radius: 6px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid var(--border-color);
+        }
+
+        .manager-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .manager-bar label {
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--text-muted);
+        }
+
+        select, input[type="text"].nav-input {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 8px 12px;
+            border-radius: 4px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        button {
+            background-color: var(--accent-red);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background-color: #b80710;
+        }
+
+        button.btn-secondary {
+            background-color: #444;
+        }
+        button.btn-secondary:hover {
+            background-color: #555;
+        }
+
+        /* --- ALL-DARK SCRIPT NOTES MASTER CONTAINER CANVAS --- */
+        .document-container {
+            max-width: 1300px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            color: var(--text-color);
+            padding: 20px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.6);
+        }
+
+        /* Layout Architecture Utilities */
+        .grid-row {
+            display: flex;
+            width: 100%;
+        }
+
+        .grid-col {
+            flex: 1;
+            border: 1px solid var(--border-color);
+            margin-right: -1px;
+            margin-bottom: -1px;
+            padding: 8px;
+            background: var(--cell-bg-dark);
+        }
+
+        /* Top Page Header Panel Banner matching 1000055526.png */
+        .report-header-banner {
+            background-color: #000000;
+            color: #ffffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 10px;
+        }
+
+        .header-title-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-title-area h1 {
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        .header-date-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: bold;
+            color: var(--text-muted);
+        }
+
+        .header-date-box input {
+            color: var(--text-color);
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            text-align: center;
+            width: 110px;
+            outline: none;
+            padding: 4px;
+        }
+
+        /* Input Form Elements Mapping Labels */
+        .field-row-block {
+            display: flex;
+            align-items: center;
+            margin-bottom: 6px;
+            gap: 8px;
+        }
+
+        .field-row-block:last-child {
+            margin-bottom: 0;
+        }
+
+        .field-row-block label {
+            white-space: nowrap;
+            text-transform: uppercase;
+            font-size: 10px;
+            font-weight: bold;
+            color: var(--text-muted);
+            width: 130px;
+        }
+
+        .field-row-block input[type="text"] {
+            width: 100%;
+            border: none;
+            border-bottom: 1px solid var(--border-color);
+            background: transparent;
+            outline: none;
+            font-size: 12px;
+            color: var(--text-color);
+            padding: 2px;
+        }
+
+        /* Section Layout Strip Headers */
+        .section-strip-header {
+            background-color: var(--header-dark);
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+            text-align: center;
+            padding: 6px;
+            border: 1px solid var(--border-color);
+            margin-top: 12px;
+            margin-bottom: -1px;
+            letter-spacing: 0.5px;
+        }
+
+        /* Dual Column Split Tables */
+        .split-tables-container {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            width: 100%;
+            margin-bottom: 12px;
+        }
+
+        .table-column-box {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Log Sheets Structural Grid Layouts */
+        .log-grid-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .log-grid-table th {
+            background-color: #0d0d0d;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            font-size: 9px;
+            font-weight: bold;
+            text-transform: uppercase;
+            padding: 6px 3px;
+            text-align: center;
+        }
+
+        .log-grid-table td {
+            border: 1px solid var(--border-color);
+            padding: 0;
+            background: #161616;
+            font-size: 11px;
+        }
+
+        .log-grid-table input[type="text"] {
+            width: 100%;
+            border: none;
+            background: transparent;
+            padding: 6px 4px;
+            font-size: 12px;
+            color: var(--text-color);
+            text-align: center;
+            outline: none;
+        }
+
+        .cell-checkbox-align {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            font-size: 10px;
+            font-weight: bold;
+            height: 28px;
+        }
+
+        .cell-checkbox-align label {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            cursor: pointer;
+        }
+
+        /* Continuity Card Quad Grids Blocks */
+        .continuity-quad-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            width: 100%;
+            margin-bottom: 12px;
+        }
+
+        .continuity-card-header {
+            background: #111111;
+            padding: 6px;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        /* 3-Column Text Memo Areas Layout */
+        .memo-tri-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            width: 100%;
+            margin-bottom: 12px;
+        }
+
+        .memo-block-card {
+            border: 1px solid var(--border-color);
+            background: var(--cell-bg-dark);
+            margin-right: -1px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .memo-block-header {
+            background: #111111;
+            padding: 6px 10px;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .memo-checkbox-strip {
+            padding: 6px 10px;
+            display: flex;
+            gap: 12px;
+            font-size: 9px;
+            font-weight: bold;
+            border-bottom: 1px solid var(--border-color);
+            background: #161616;
+        }
+
+        .memo-checkbox-strip label {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            cursor: pointer;
+        }
+
+        .memo-block-card textarea {
+            width: 100%;
+            height: 90px;
+            background: transparent;
+            border: none;
+            resize: none;
+            outline: none;
+            padding: 8px;
+            color: var(--text-color);
+            font-size: 12px;
+            font-family: inherit;
+            line-height: 1.4;
+        }
+
+        /* Bottom Operational Grids Split blocks */
+        .bottom-workspace-grid {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr 1fr;
+            width: 100%;
+            margin-bottom: 12px;
+        }
+
+        .bottom-card-box {
+            border: 1px solid var(--border-color);
+            background: var(--cell-bg-dark);
+            margin-right: -1px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .checklist-rows-basin {
+            padding: 12px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .checklist-rows-basin label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        /* Bottom Footer Credentials Strip Lines */
+        .footer-signatures-strip {
+            display: flex;
+            border: 1px solid var(--border-color);
+            background: #0d0d0d;
+            padding: 12px;
+            gap: 30px;
+            font-size: 11px;
+            font-weight: bold;
+            align-items: center;
+        }
+
+        .moto-footer-banner {
+            background-color: #000000;
+            color: #ffffff;
+            text-align: center;
+            padding: 6px;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border: 1px solid var(--border-color);
+            margin-top: 10px;
+        }
+
+        /* --- IMMACULATE LIGHT PRINT ENGINE CONFIGURATION --- */
+        @media print {
+            @page {
+                size: letter portrait;
+                margin: 0.3in;
+            }
+            body {
+                background: #ffffff !important;
+                color: #000000 !important;
+                padding-bottom: 0;
+            }
+            .navbar, .manager-bar, button {
+                display: none !important;
+            }
+            .document-container {
+                max-width: 100%;
+                box-shadow: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                background: transparent !important;
+                border: none !important;
+            }
+            .grid-col, .table-column-box, .log-grid-table td, .memo-block-card, .bottom-card-box {
+                background: #ffffff !important;
+                border: 1px solid #000000 !important;
+            }
+            input[type="text"], textarea {
+                color: #000000 !important;
+                background: transparent !important;
+            }
+            .field-row-block label, .header-date-box, .continuity-card-header, .memo-block-header, .checklist-rows-basin label {
+                color: #000000 !important;
+            }
+            .report-header-banner, .section-strip-header, .log-grid-table th, .continuity-card-header, .memo-block-header {
+                background-color: #e6e6e6 !important;
+                color: #000000 !important;
+                border: 1px solid #000000 !important;
+            }
+            .memo-checkbox-strip, .footer-signatures-strip, .moto-footer-banner {
+                background: #ffffff !important;
+                color: #000000 !important;
+                border: 1px solid #000000 !important;
+            }
+            .header-date-box input, .field-row-block input[type="text"] {
+                border-bottom-color: #000000 !important;
+                background: transparent !important;
+                color: #000000 !important;
+            }
+            .log-grid-table th { font-size: 8px !important; }
+            .log-grid-table td input { font-size: 11px !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVIGATION BAR -->
+    <nav class="navbar">
+        <a class="navbar-brand" href="index.html">
+            <img src="Invinc.png" alt="Invincible Studio Logo">
+        </a>
+        <ul class="navbar-nav">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="production.html">Back</a></li>
+        </ul>
+    </nav>
+
+    <!-- STORAGE MANAGEMENT TERMINAL TOOLBAR -->
+    <div class="manager-bar">
+        <div class="manager-group">
+            <label for="report-selector">Saved Notes:</label>
+            <select id="report-selector" onchange="loadScriptNotes()">
+                <option value="default">-- Create Blank Report --</option>
+            </select>
+            <button class="btn-secondary" onclick="deleteScriptNotesProfile()">Delete Record</button>
+        </div>
+        <div class="manager-group">
+            <input type="text" id="save-profile-input" class="nav-input" placeholder="Scene / Slate Identity...">
+            <button onclick="saveScriptNotes()">Save Record</button>
+            <button onclick="window.print()">Export Report PDF</button>
+        </div>
+    </div>
+
+    <!-- MAIN COLD CORE SHEET CANVAS WRAPPER -->
+    <div class="document-container">
+        
+        <!-- HEADER TOP PANEL DISPLAY -->
+        <div class="report-header-banner">
+            <div class="header-title-area">
+                <span style="font-size:22px; line-height:1;">🎬</span>
+                <h1>SCRIPT SUPERVISOR NOTES</h1>
+            </div>
+            <div class="header-date-box">
+                <span>DATE:</span>
+                <input type="text" data-scr="h_date" placeholder="/      /">
+            </div>
+        </div>
+
+        <!-- MAIN SUB-GRID PARAMETERS FRAME -->
+        <div class="grid-row">
+            <!-- Box 1: Core Crew Variables Map -->
+            <div class="grid-col" style="flex: 1.1;">
+                <div class="field-row-block"><label>Production:</label><input type="text" data-scr="m_production"></div>
+                <div class="field-row-block"><label>Director:</label><input type="text" data-scr="m_director"></div>
+                <div class="field-row-block"><label>DOP:</label><input type="text" data-scr="m_dop"></div>
+                <div class="field-row-block"><label>Script Supervisor:</label><input type="text" data-scr="m_supervisor"></div>
+            </div>
+            <!-- Box 2: Spatial Page Trackers Split -->
+            <div class="grid-col" style="flex: 1;">
+                <div class="field-row-block"><label>Scene #:</label><input type="text" data-scr="m_scene_num"></div>
+                <div class="field-row-block"><label>Location:</label><input type="text" data-scr="m_location"></div>
+                <div class="field-row-block"><label>Script Page(s):</label><input type="text" data-scr="m_pages"></div>
+                <div class="field-row-block" style="margin-top:4px;">
+                    <label>Day / Night:</label>
+                    <div style="display:flex; gap:12px; font-size:11px; font-weight:bold; margin-left:2px;">
+                        <label style="width:auto; color:var(--text-color);"><input type="checkbox" id="dn_day"> DAY</label>
+                        <label style="width:auto; color:var(--text-color);"><input type="checkbox" id="dn_night"> NIGHT</label>
+                    </div>
+                </div>
+            </div>
+            <!-- Box 3: Slate Timeline Sequences -->
+            <div class="grid-col" style="flex: 0.9;">
+                <div class="field-row-block"><label>Episode / Part #:</label><input type="text" data-scr="m_episode"></div>
+                <div class="field-row-block"><label>Shoot Day #:</label><input type="text" data-scr="m_shoot_day"></div>
+                <div class="field-row-block"><label>Weather:</label><input type="text" data-scr="m_weather"></div>
+            </div>
+            <!-- Box 4: Standard Project Version metrics -->
+            <div class="grid-col" style="flex: 0.9;">
+                <div class="field-row-block"><label>Script Version:</label><input type="text" data-scr="m_version"></div>
+                <div class="field-row-block"><label>Shooting Order:</label><input type="text" data-scr="m_order"></div>
+                <div class="field-row-block"><label>Total Pages:</label><input type="text" data-scr="m_total_pages"></div>
+            </div>
+        </div>
+
+     <!-- DUAL SECTIONS LOG CHANNELS SPLIT LAYOUT -->
+        <div class="split-tables-container">
+            <!-- Table Segment Left: Scene / Take Information Matrix -->
+            <div class="table-column-box" style="margin-right: -1px;">
+                <div class="section-strip-header" style="border-right:none;">Scene / Take Information</div>
+                <table class="log-grid-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 10%;">Shot #</th>
+                            <th style="width: 10%;">Take #</th>
+                            <th style="width: 18%;">Slate / Clap</th>
+                            <th style="width: 15%;">Start Time</th>
+                            <th style="width: 15%;">End Time</th>
+                            <th style="width: 16%;">Good Take?</th>
+                            <th style="width: 16%;">Notes / Reason for NG</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scene-log-basin">
+                        <!-- Instantiated programmatically inside window onload loop blocks -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Table Segment Right: Lined Script / Camera Coverage Tracking -->
+            <div class="table-column-box">
+                <div class="section-strip-header">Lined Script / Camera Coverage</div>
+                <table class="log-grid-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 12%;">Line #</th>
+                            <th style="width: 64%; text-align:left; padding-left:8px;">Script Dialogue / Action</th>
+                            <th style="width: 12%;">Shot #</th>
+                            <th style="width: 12%;">Take #</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lined-coverage-basin">
+                        <!-- Generated line matrices structures loaded sequentially -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- CONTINUITY NOTES MASTER CONTROL LAYERS HEADER -->
+        <div class="section-strip-header">Continuity Notes</div>
+        
+        <!-- 4-COLUMN TRACKING GRIDS ARRAY -->
+        <div class="continuity-quad-grid">
+            <!-- Quad Cell 1: Actor Continuity -->
+            <div class="table-column-box" style="margin-right: -1px;">
+                <div class="continuity-card-header"><span>👤</span> Actor Continuity</div>
+                <table class="log-grid-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 40%;">Character / Actor</th>
+                            <th style="width: 60%;">Position / Action / Movement</th>
+                        </tr>
+                    </thead>
+                    <tbody id="actor-continuity-basin"></tbody>
+                </table>
+            </div>
+            <!-- Quad Cell 2: Costume / Makeup / Hair -->
+            <div class="table-column-box" style="margin-right: -1px;">
+                <div class="continuity-card-header"><span>👚</span> Costume / Makeup / Hair</div>
+                <table class="log-grid-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 40%;">Character / Actor</th>
+                            <th style="width: 60%;">Costume, Makeup, Hair, Condition</th>
+                        </tr>
+                    </thead>
+                    <tbody id="costume-continuity-basin"></tbody>
+                </table>
+            </div>
+            <!-- Quad Cell 3: Props Continuity -->
+            <div class="table-column-box" style="margin-right: -1px;">
+                <div class="continuity-card-header"><span>📦</span> Props Continuity</div>
+                <table class="log-grid-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 35%;">Prop(s)</th>
+                            <th style="width: 65%;">Details / Position / Condition</th>
+                        </tr>
+                    </thead>
+                    <tbody id="props-continuity-basin"></tbody>
+                </table>
+            </div>
+            <!-- Quad Cell 4: Set / Location / Background -->
+            <div class="table-column-box">
+                <div class="continuity-card-header"><span>📍</span> Set / Location / Background</div>
+                <table class="log-grid-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 35%;">Detail</th>
+                            <th style="width: 65%;">Description / Position</th>
+                        </tr>
+                    </thead>
+                    <tbody id="set-continuity-basin"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 3-COLUMN DIALOGUE, ACTION & REMARKS LOG WRAPPER -->
+        <div class="memo-tri-grid">
+            <!-- Column 1: Dialogue Notes -->
+            <div class="memo-block-card">
+                <div class="memo-block-header"><span>💬</span> Dialogue Notes</div>
+                <div class="memo-checkbox-strip">
+                    <label><input type="checkbox" id="dial_as_written"> AS WRITTEN</label>
+                    <label><input type="checkbox" id="dial_improvised"> IMPROVISED</label>
+                    <label><input type="checkbox" id="dial_line_change"> LINE CHANGE</label>
+                </div>
+                <textarea id="memo-dialogue-text" data-scr="txt_memo_dialogue" placeholder="Enter explicit textual changes, syntax adjustments or line pacing corrections annotations here..."></textarea>
+            </div>
+
+            <!-- Column 2: Action / Event Notes -->
+            <div class="memo-block-card">
+                <div class="memo-block-header"><span>🏃</span> Action / Event Notes</div>
+                <div style="font-size:9px; font-weight:bold; color:var(--text-muted); padding:6px 10px; background:#161616; border-bottom:1px solid var(--border-color); text-transform:uppercase;">Actions, Timing, Events in Scene</div>
+                <textarea id="memo-action-text" data-scr="txt_memo_action" placeholder="Track physical gesture markers, door entrance timing parameters, key look matches coordinates adjustments..."></textarea>
+            </div>
+
+            <!-- Column 3: Notes / Issues / Remarks -->
+            <div class="memo-block-card">
+                <div class="memo-block-header"><span>⚠️</span> Notes / Issues / Remarks</div>
+                <div class="memo-checkbox-strip">
+                    <label><input type="checkbox" id="iss_continuity"> CONTINUITY ERROR</label>
+                    <label><input type="checkbox" id="iss_technical"> TECHNICAL ISSUE</label>
+                    <label><input type="checkbox" id="iss_script"> SCRIPT ISSUE</label>
+                    <label><input type="checkbox" id="iss_other"> OTHER</label>
+                </div>
+                <textarea id="memo-remarks-text" data-scr="txt_memo_remarks" placeholder="Log audio discrepancies, camera lens field block corrections, focus pulls variations or production delays info..."></textarea>
+            </div>
+        </div>
+
+        <!-- LOWER METRICS EVALUATIONS FRAME GRIDS SPLIT -->
+        <div class="bottom-workspace-grid">
+            <!-- Box 1: Best Take / Performance Notes -->
+            <div class="bottom-card-box">
+                <div class="memo-block-header" style="background:var(--header-dark); color:#fff;"><span>⭐</span> Best Take / Performance Notes</div>
+                <div style="padding:10px; flex-grow:1;">
+                    <div class="field-row-block"><label style="width:140px;">Best Take:</label><input type="text" data-scr="perf_best_take"></div>
+                    <div class="field-row-block" style="margin-bottom:12px;"><label style="width:140px;">Best Performance Notes:</label><input type="text" data-scr="perf_notes"></div>
+                    <div class="field-row-block"><label style="width:140px;">Director's Preferred Take:</label><input type="text" data-scr="perf_director_pref"></div>
+                    <div class="field-row-block" style="margin-bottom:0;"><label style="width:140px;">Remarks:</label><input type="text" data-scr="perf_remarks"></div>
+                </div>
+            </div>
+
+            <!-- Box 2: Continuity Checklist Interlock -->
+            <div class="bottom-card-box">
+                <div class="memo-block-header" style="background:var(--header-dark); color:#fff;"><span>📋</span> Continuity Checklist</div>
+                <div class="checklist-rows-basin">
+                    <label><input type="checkbox" id="chk_pos"> Actor Position / Movement</label>
+                    <label><input type="checkbox" id="chk_eye"> Eye Lines / Match</label>
+                    <label><input type="checkbox" id="chk_hand"> Hand Continuity</label>
+                    <label><input type="checkbox" id="chk_prop"> Props (Position / Condition)</label>
+                    <label><input type="checkbox" id="chk_cost"> Costume (Condition / Details)</label>
+                    <label><input type="checkbox" id="chk_make"> Makeup / Hair</label>
+                    <label><input type="checkbox" id="chk_set"> Set / Background</label>
+                    <label><input type="checkbox" id="chk_light"> Lighting Continuity</label>
+                    <div style="display:flex; align-items:center; width:100%; gap:4px; margin-top:-2px;"><label style="white-space:nowrap; margin-right:2px;"><input type="checkbox" id="chk_oth"> Other:</label><input type="text" data-scr="chk_other_text" style="width:100%; border:none; border-bottom:1px solid var(--border-color); background:transparent; font-size:11px; outline:none; color:var(--text-color);"></div>
+                </div>
+            </div>
+
+            <!-- Box 3: Next Scene Setup Notes / To Prep -->
+            <div class="bottom-card-box">
+                <div class="memo-block-header" style="background:var(--header-dark); color:#fff;"><span>📝</span> Next Scene Setup Notes / To Prep</div>
+                <textarea id="next-scene-prep-text" data-scr="txt_next_scene_prep" style="height:100%; min-height:160px; padding:12px;" placeholder="Outline blocking setups, complex special tracking movements to coordinate, required foreground set pieces arrangements, or custom lens properties configurations to prepare ahead of transition..."></textarea>
+            </div>
+        </div>
+
+        <!-- AUTHENTICATION CREDENTIALS PANEL -->
+        <div class="footer-signatures-strip">
+            <div style="display:flex; flex:1; align-items:center; gap:8px;"><label style="color:var(--text-muted); font-size:10px; text-transform:uppercase; white-space:nowrap;">Script Supervisor Signature:</label><input type="text" placeholder="____________________________________________" disabled style="border:none; background:transparent; width:100%;"></div>
+            <div style="display:flex; flex:1; align-items:center; gap:8px; border-left:1px dashed var(--border-color); padding-left:20px;"><label style="color:var(--text-muted); font-size:10px; text-transform:uppercase; white-space:nowrap;">Director Signature:</label><input type="text" placeholder="____________________________________________" disabled style="border:none; background:transparent; width:100%;"></div>
+            
+            <!-- Directives Multi Distribution Vectors -->
+            <div style="display:flex; flex-direction:column; font-size:10px; gap:4px; padding-left:10px;">
+                <span style="color:var(--text-muted); text-transform:uppercase; font-size:9px;">Notes Distributed To:</span>
+                <div style="display:flex; gap:10px; flex-wrap:wrap; color:var(--text-color);">
+                    <label><input type="checkbox" id="dist_dir"> DIR</label>
+                    <label><input type="checkbox" id="dist_dop"> DOP</label>
+                    <label><input type="checkbox" id="dist_prod"> PROD</label>
+                    <label><input type="checkbox" id="dist_edit"> EDIT</label>
+                    <label><input type="checkbox" id="dist_sound"> SOUND</label>
+                    <label><input type="checkbox" id="dist_oth"> OTH</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- CENTRAL SLOGAN RUN FOOTER PANEL -->
+        <div class="moto-footer-banner">
+            ACCURATE NOTES &nbsp; ★ &nbsp; CONSISTENCY IS CONTINUITY &nbsp; ★ &nbsp; GOOD NOTES = GOOD EDIT
+        </div>
+
+    </div>
+
+    <!-- UTILITY STORAGE CONFIGURE ENGINE SCRIPT CODES -->
+    <script>
+        const TOGGLE_MUTEX_GROUPS = [
+            ["dn_day", "dn_night"]
+        ];
+
+        window.onload = function() {
+            instantiateBlankTableGrids();
+            clearDocumentCanvas();
+            refreshDatabaseSelector();
+            setupMutexToggleTriggers();
+        };
+
+        function instantiateBlankTableGrids() {
+            // 1. Scene Log Left: Generate 11 standard sequence cells lines
+            const logBasin = document.getElementById('scene-log-basin');
+            logBasin.innerHTML = '';
+            for (let i = 1; i <= 11; i++) {
+                const tr = document.createElement('tr');
+                tr.className = "row-sc-data-node";
+                tr.innerHTML = `
+                    <td><input type="text" class="sc-c-shot"></td>
+                    <td><input type="text" class="sc-c-take"></td>
+                    <td><input type="text" class="sc-c-slate"></td>
+                    <td><input type="text" class="sc-c-start"></td>
+                    <td><input type="text" class="sc-c-end"></td>
+                    <td>
+                        <div class="cell-checkbox-align">
+                            <label><input type="radio" name="gt_${i}" value="y"> Y</label>
+                            <label><input type="radio" name="gt_${i}" value="n"> N</label>
+                        </div>
+                    </td>
+                    <td><input type="text" class="sc-c-reason" style="text-align:left; padding-left:4px;"></td>
+                `;
+                logBasin.appendChild(tr);
+            }
+
+            // 2. Coverage Lined Right: Generate 11 tracking coordinate lines layout index
+            const coverBasin = document.getElementById('lined-coverage-basin');
+            coverBasin.innerHTML = '';
+            // Display numbers starting sequentially to match template grid structures
+            for (let i = 1; i <= 11; i++) {
+                const tr = document.createElement('tr');
+                tr.className = "row-cv-data-node";
+                tr.innerHTML = `
+                    <td style="text-align:center; background-color:#0d0d0d; font-weight:bold; color:var(--text-muted); font-size:10px;">${i}</td>
+                    <td><input type="text" class="cv-c-dialogue" style="text-align:left; padding-left:6px;"></td>
+                    <td><input type="text" class="cv-c-shot"></td>
+                    <td><input type="text" class="cv-c-take"></td>
+                `;
+                coverBasin.appendChild(tr);
+            }
+
+            // 3. Four-Column Continuity Maps Layer: Generate exactly 4 data entries mapping boxes per quadrant box
+            const cBasins = {
+                'actor': document.getElementById('actor-continuity-basin'),
+                'costume': document.getElementById('costume-continuity-basin'),
+                'props': document.getElementById('props-continuity-basin'),
+                'set': document.getElementById('set-continuity-basin')
+            };
+            
+            Object.keys(cBasins).forEach(key => {
+                cBasins[key].innerHTML = '';
+                for (let i = 1; i <= 4; i++) {
+                    const tr = document.createElement('tr');
+                    tr.className = `row-cont-${key}-node`;
+                    tr.innerHTML = `
+                        <td><input type="text" class="ct-cell-a"></td>
+                        <td><input type="text" class="ct-cell-b" style="text-align:left; padding-left:5px;"></td>
+                    `;
+                    cBasins[key].appendChild(tr);
+                }
+            });
+        }
+
+        function clearDocumentCanvas() {
+            document.querySelectorAll('[data-scr]').forEach(input => input.value = '');
+            document.querySelectorAll('.document-container input[type="checkbox"]').forEach(box => box.checked = false);
+            document.querySelectorAll('input[type="radio"]').forEach(radio => radio.checked = false);
+            document.querySelectorAll('.document-container input[type="text"]').forEach(input => input.value = '');
+        }
+
+        function setupMutexToggleTriggers() {
+            TOGGLE_MUTEX_GROUPS.forEach(pair => {
+                const nodeA = document.getElementById(pair[0]);
+                const nodeB = document.getElementById(pair[1]);
+                if (nodeA && nodeB) {
+                    nodeA.addEventListener('change', () => { if (nodeA.checked) nodeB.checked = false; });
+                    nodeB.addEventListener('change', () => { if (nodeB.checked) nodeA.checked = false; });
+                }
+            });
+        }
+
+        /* --- HARD WORKSPACE DIRECT DATABASE RETENTION INTERFACE MAPS --- */
+        function getStorageDatabase() {
+            const rawData = localStorage.getItem('invincible_script_notes_v1');
+            return rawData ? JSON.parse(rawData) : {};
+        }
+
+        function refreshDatabaseSelector() {
+            const selector = document.getElementById('report-selector');
+            const database = getStorageDatabase();
+
+            selector.innerHTML = '<option value="default">-- Create Blank Report --</option>';
+            Object.keys(database).forEach(key => {
+                const option = document.createElement('option');
+                option.value = key;
+                option.textContent = key;
+                selector.appendChild(option);
+            });
+        }
+
+        function saveScriptNotes() {
+            const profileName = document.getElementById('save-profile-input').value.trim();
+            if (!profileName) {
+                alert("Please declare a unique reference log configuration profile name to commit this template layer.");
+                return;
+            }
+
+            const activeDataset = {
+                metadata: {},
+                checkboxes: {},
+                sceneRows: [],
+                coverageRows: [],
+                contActor: [],
+                contCostume: [],
+                contProps: [],
+                contSet: []
+            };
+
+            // Grab properties mapping tokens
+            document.querySelectorAll('[data-scr]').forEach(input => {
+                activeDataset.metadata[input.getAttribute('data-scr')] = input.value;
+            });
+
+            // Grab configurations checkboxes values
+            document.querySelectorAll('.document-container input[type="checkbox"]').forEach(box => {
+                activeDataset.checkboxes[box.id] = box.checked;
+            });
+
+            // Parse Left Matrix Scene Logs
+            document.querySelectorAll('.row-sc-data-node').forEach((row, idx) => {
+                activeDataset.sceneRows.push({
+                    shot: row.querySelector('.sc-c-shot').value,
+                    take: row.querySelector('.sc-c-take').value,
+                    slate: row.querySelector('.sc-c-slate').value,
+                    start: row.querySelector('.sc-c-start').value,
+                    end: row.querySelector('.sc-c-end').value,
+                    goodtake: row.querySelector(`input[name="gt_${idx+1}"]:checked`)?.value || null,
+                    reason: row.querySelector('.sc-c-reason').value
+                });
+            });
+
+            // Parse Right Matrix Coverage Logs
+            document.querySelectorAll('.row-cv-data-node').forEach(row => {
+                activeDataset.coverageRows.push({
+                    dialogue: row.querySelector('.cv-c-dialogue').value,
+                    shot: row.querySelector('.cv-c-shot').value,
+                    take: row.querySelector('.cv-c-take').value
+                });
+            });
+
+            // Parse Quadrant Arrays Loops Helper Engine
+            const extractQuad = (selector) => {
+                const out = [];
+                document.querySelectorAll(selector).forEach(row => {
+                    out.push({
+                        a: row.querySelector('.ct-cell-a').value,
+                        b: row.querySelector('.ct-cell-b').value
+                    });
+                });
+                return out;
+            };
+
+            activeDataset.contActor = extractQuad('.row-cont-actor-node');
+            activeDataset.contCostume = extractQuad('.row-cont-costume-node');
+            activeDataset.contProps = extractQuad('.row-cont-props-node');
+            activeDataset.contSet = extractQuad('.row-cont-set-node');
+
+            const database = getStorageDatabase();
+            database[profileName] = activeDataset;
+            localStorage.setItem('invincible_script_notes_v1', JSON.stringify(database));
+
+            refreshDatabaseSelector();
+            document.getElementById('report-selector').value = profileName;
+            alert(`"${profileName}" compiled successfully to secure local application memory cache.`);
+        }
+
+        function loadScriptNotes() {
+            const targetKey = document.getElementById('report-selector').value;
+            if (targetKey === 'default') {
+                clearDocumentCanvas();
+                instantiateBlankTableGrids();
+                document.getElementById('save-profile-input').value = '';
+                return;
+            }
+
+            const database = getStorageDatabase();
+            const config = database[targetKey];
+            if (!config) return;
+
+            document.getElementById('save-profile-input').value = targetKey;
+
+            // Map structural text items safely
+            Object.keys(config.metadata).forEach(key => {
+                const targetNode = document.querySelector(`[data-scr="${key}"]`);
+                if (targetNode) targetNode.value = config.metadata[key];
+            });
+
+            // Map checklist check configurations
+            Object.keys(config.checkboxes).forEach(id => {
+                const targetNode = document.getElementById(id);
+                if (targetNode) targetNode.checked = config.checkboxes[id];
+            });
+
+            // Map Left Grid
+            const sceneNodes = document.querySelectorAll('.row-sc-data-node');
+            config.sceneRows.forEach((data, idx) => {
+                if (sceneNodes[idx]) {
+                    sceneNodes[idx].querySelector('.sc-c-shot').value = data.shot || '';
+                    sceneNodes[idx].querySelector('.sc-c-take').value = data.take || '';
+                    sceneNodes[idx].querySelector('.sc-c-slate').value = data.slate || '';
+                    sceneNodes[idx].querySelector('.sc-c-start').value = data.start || '';
+                    sceneNodes[idx].querySelector('.sc-c-end').value = data.end || '';
+                    if (data.goodtake) {
+                        const rNode = sceneNodes[idx].querySelector(`input[name="gt_${idx+1}"][value="${data.goodtake}"]`);
+                        if(rNode) rNode.checked = true;
+                    }
+                    sceneNodes[idx].querySelector('.sc-c-reason').value = data.reason || '';
+                }
+            });
+
+            // Map Right Grid
+            const coverNodes = document.querySelectorAll('.row-cv-data-node');
+            config.coverageRows.forEach((data, idx) => {
+                if (coverNodes[idx]) {
+                    coverNodes[idx].querySelector('.cv-c-dialogue').value = data.dialogue || '';
+                    coverNodes[idx].querySelector('.cv-c-shot').value = data.shot || '';
+                    coverNodes[idx].querySelector('.cv-c-take').value = data.take || '';
+                }
+            });
+
+            // Reconstruct Quadrant Arrays
+            const populateQuad = (nodes, dataset) => {
+                dataset.forEach((data, idx) => {
+                    if (nodes[idx]) {
+                        nodes[idx].querySelector('.ct-cell-a').value = data.a || '';
+                        nodes[idx].querySelector('.ct-cell-b').value = data.b || '';
+                    }
+                });
+            };
+
+            populateQuad(document.querySelectorAll('.row-cont-actor-node'), config.contActor);
+            populateQuad(document.querySelectorAll('.row-cont-costume-node'), config.contCostume);
+            populateQuad(document.querySelectorAll('.row-cont-props-node'), config.contProps);
+            populateQuad(document.querySelectorAll('.row-cont-set-node'), config.contSet);
+        }
+
+        function deleteScriptNotesProfile() {
+            const activeProfile = document.getElementById('report-selector').value;
+            if (activeProfile === 'default') return;
+
+            if (confirm(`Permanently erase script supervisor continuity record profile log: "${activeProfile}"?`)) {
+                const database = getStorageDatabase();
+                delete database[activeProfile];
+                localStorage.setItem('invincible_script_notes_v1', JSON.stringify(database));
+
+                document.getElementById('save-profile-input').value = '';
+                refreshDatabaseSelector();
+                clearDocumentCanvas();
+                instantiateBlankTableGrids();
+            }
+        }
+    </script>
+</body>
+</html>

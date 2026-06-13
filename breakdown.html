@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Script Breakdown Sheet - Invinc</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        /* Netflix-inspired Dark Theme Variables */
+        :root {
+            --bg-color: #141414;
+            --nav-bg: #000000;
+            --card-bg: #181818;
+            --accent-color: #E50914;
+            --text-color: #FFFFFF;
+            --text-muted: #A3A3A3;
+            --border-color: #2F2F2F;
+            --input-focus: #333333;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Navigation Bar */
+        nav {
+            background-color: var(--nav-bg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 2%;
+            height: 60px;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            flex-shrink: 0;
+        }
+
+        .logo img {
+            height: 30px;
+            vertical-align: middle;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-color);
+        }
+
+        /* Split Screen Architecture */
+        .workspace-split {
+            display: flex;
+            flex: 1;
+            height: calc(100vh - 60px);
+            width: 100%;
+            overflow: hidden;
+        }
+
+        /* Left Panel: Script Viewport Engine */
+        .panel-left {
+            width: 50%;
+            border-right: 2px solid var(--border-color);
+            background-color: #0c0c0c;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            background-color: var(--card-bg);
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+
+        .panel-title {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+
+        .pdf-uploader-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .pdf-scroll-view {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+            background-color: #111;
+        }
+
+        .pdf-page-wrapper {
+            background-color: var(--card-bg);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            width: 100%;
+        }
+
+        canvas {
+            width: 100% !important;
+            height: auto !important;
+        }
+
+        /* Right Panel: Interactive Breakdown Sheet Grid */
+        .panel-right {
+            width: 50%;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background-color: var(--bg-color);
+        }
+
+        .sheet-scroll-view {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        /* Metadata Header Fields */
+        .meta-group-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            background-color: #0b0b0b;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Core Breakdown Matrix Blocks (Based strictly on image layout) */
+        .breakdown-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            width: 100%;
+        }
+
+        .grid-box {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-height: 140px;
+        }
+
+        .grid-box.double-width { grid-column: span 2; }
+        .grid-box.triple-width { grid-column: span 3; }
+
+        .box-header {
+            font-size: 0.72rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding-bottom: 4px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        /* Category Color Accents mapped from image keys */
+        .label-cast { color: #ff4d4d; }
+        .label-stunts { color: #ff9900; }
+        .label-extras-atm { color: #2ecc71; }
+        .label-extras-sil { color: #f1c40f; }
+        .label-sfx { color: #3498db; }
+        .label-props { color: #9b59b6; }
+        .label-vehicles { color: #ff85a2; }
+        .label-wardrobe { color: #00ffff; }
+        .label-makeup { color: #e67e22; }
+        .label-music { color: #a0522d; }
+        .label-special-equip { color: #e84393; }
+        .label-prod-notes { color: #1abc9c; }
+
+        /* Dynamic form styling */
+        .field-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .field-container label {
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .input-text {
+            width: 100%;
+            background-color: #222;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 6px 8px;
+            font-size: 0.85rem;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .input-text:focus {
+            background-color: var(--input-focus);
+            border-color: var(--accent-color);
+            outline: none;
+        }
+
+        .textarea-box {
+            width: 100%;
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            font-size: 0.85rem;
+            resize: none;
+            padding: 4px 0;
+        }
+
+        .textarea-box:focus {
+            outline: none;
+        }
+
+        /* Global Control buttons */
+        .btn-action {
+            background-color: var(--accent-color);
+            color: #fff;
+            border: none;
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-action:hover { background-color: #B81D24; }
+        .btn-secondary { background-color: transparent; border: 1px solid var(--border-color); color: var(--text-muted); }
+        .btn-secondary:hover { background-color: var(--border-color); color: #fff; }
+
+        input[type="file"] { display: none; }
+
+        @media (max-width: 1024px) {
+            .workspace-split { flex-direction: column; overflow-y: auto; }
+            .panel-left, .panel-right { width: 100%; height: 50vh; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">
+            <a href="index.html"><img src="Invinc.png" alt="Invinc Logo"></a>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="visual.html">Back</a></li>
+        </ul>
+    </nav>
+
+    <div class="workspace-split">
+
+        <div class="panel-left">
+            <div class="panel-header">
+                <span class="panel-title" id="pdfNameDisplay">Script Engine Viewer</span>
+                <button class="btn-action btn-secondary" id="clearPdfBtn" style="display:none;">Clear File</button>
+            </div>
+            
+            <div class="pdf-uploader-area" id="uploadPromptBox">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><polyline points="9 15 12 12 15 15"></polyline></svg>
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin: 10px 0;">Inject production reference script PDF</p>
+                <button class="btn-action" onclick="document.getElementById('pdfFileInput').click()">Upload Script</button>
+                <input type="file" id="pdfFileInput" accept="application/pdf">
+            </div>
+
+            <div class="pdf-scroll-view" id="pdfCanvasContainer"></div>
+        </div>
+
+        <div class="panel-right">
+            <div class="panel-header">
+                <span class="panel-title">Breakdown Sheet Matrix</span>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn-action btn-secondary" onclick="resetFormGrid()">Reset</button>
+                    <button class="btn-action" onclick="exportBreakdownPDF()">Export Sheet</button>
+                </div>
+            </div>
+
+            <div class="sheet-scroll-view">
+                <div class="meta-group-row">
+                    <div class="field-container">
+                        <label>Breakdown Sheet #</label>
+                        <input type="text" id="meta-sheet-num" class="input-text" placeholder="e.g., 1">
+                    </div>
+                    <div class="field-container">
+                        <label>Page Count</label>
+                        <input type="text" id="meta-page-count" class="input-text" placeholder="e.g., 2 1/8">
+                    </div>
+                    <div class="field-container">
+                        <label>Date</label>
+                        <input type="text" id="meta-date" class="input-text" placeholder="MM/DD/YYYY">
+                    </div>
+                </div>
+
+                <div class="meta-group-row" style="grid-template-columns: repeat(2, 1fr);">
+                    <div class="field-container">
+                        <label>Prod. Company</label>
+                        <input type="text" id="meta-prod-co" class="input-text" placeholder="Production Studio">
+                    </div>
+                    <div class="field-container">
+                        <label>Project Title</label>
+                        <input type="text" id="meta-project-title" class="input-text" placeholder="Feature Film Title">
+                    </div>
+                </div>
+
+                <div class="meta-group-row" style="grid-template-columns: 2fr 3fr 1.5fr 1.5fr;">
+                    <div class="field-container">
+                        <label>Scene #</label>
+                        <input type="text" id="meta-scene-num" class="input-text">
+                    </div>
+                    <div class="field-container">
+                        <label>Scene Name</label>
+                        <input type="text" id="meta-scene-name" class="input-text">
+                    </div>
+                    <div class="field-container">
+                        <label>INT / EXT</label>
+                        <input type="text" id="meta-ie" class="input-text" placeholder="INT">
+                    </div>
+                    <div class="field-container">
+                        <label>D / N</label>
+                        <input type="text" id="meta-dn" class="input-text" placeholder="DAY">
+                    </div>
+                </div>
+
+                <div class="meta-group-row" style="grid-template-columns: repeat(2, 1fr);">
+                    <div class="field-container">
+                        <label>Script Page</label>
+                        <input type="text" id="meta-script-page" class="input-text">
+                    </div>
+                    <div class="field-container">
+                        <label>Location Name</label>
+                        <input type="text" id="meta-loc-name" class="input-text">
+                    </div>
+                </div>
+
+                <div class="meta-group-row" style="grid-template-columns: 1fr;">
+                    <div class="field-container">
+                        <label>Scene Description</label>
+                        <input type="text" id="meta-description" class="input-text" placeholder="Describe the scene events brief summary...">
+                    </div>
+                </div>
+
+                <div class="breakdown-grid">
+                    <div class="grid-box">
+                        <div class="box-header label-cast">Cast (Red)</div>
+                        <textarea id="box-cast" class="textarea-box" placeholder="List characters..."></textarea>
+                    </div>
+
+                    <div class="grid-box">
+                        <div class="box-header label-stunts">Stunts (Orange)</div>
+                        <textarea id="box-stunts" class="textarea-box" placeholder="Stunt doubles, actions..."></textarea>
+                    </div>
+
+                    <div class="grid-box">
+                        <div class="box-header label-extras-atm">Extras/Atmosphere (Green)</div>
+                        <textarea id="box-extras-atm" class="textarea-box" placeholder="Background crowd, mood..."></textarea>
+                    </div>
+
+                    <div class="grid-box">
+                        <div class="box-header label-sfx">Special Effects (Blue)</div>
+                        <textarea id="box-sfx" class="textarea-box" placeholder="Practical effects, explosions..."></textarea>
+                    </div>
+
+                    <div class="grid-box">
+                        <div class="box-header label-props">Props (Purple)</div>
+                        <textarea id="box-props" class="textarea-box" placeholder="Handheld character items..."></textarea>
+                    </div>
+
+                    <div class="grid-box">
+                        <div class="box-header label-extras-sil">Extras/Silent (Yellow)</div>
+                        <textarea id="box-extras-sil" class="textarea-box" placeholder="Featured background players..."></textarea>
+                    </div>
+
+                    <div class="grid-box">
+                        <div class="box-header label-wardrobe">Wardrobe (Circle)</div>
+                        <textarea id="box-wardrobe" class="textarea-box" placeholder="Specific costume changes..."></textarea>
+                    </div>
+
+                    <div class="grid-box">
+                        <div class="box-header label-makeup">Makeup/Hair (* Asterisk)</div>
+                        <textarea id="box-makeup" class="textarea-box" placeholder="Prosthetics, continuity cuts..."></textarea>
+                    </div>
+
+                    <div class="grid-box">
+                        <div class="box-header label-vehicles">Vehicle / Animals (Pink)</div>
+                        <textarea id="box-vehicles" class="textarea-box" placeholder="Picture cars, handling requirements..."></textarea>
+                    </div>
+
+                    <div class="grid-box">
+                        <div class="box-header label-special-equip">Special Equipment (Box Around)</div>
+                        <textarea id="box-special-equip" class="textarea-box" placeholder="Steadicam, crane, underwater rigs..."></textarea>
+                    </div>
+
+                    <div class="grid-box">
+                        <div class="box-header label-music">Sound Effects & Music (Brown)</div>
+                        <textarea id="box-music" class="textarea-box" placeholder="Source audio tracks, practical cues..."></textarea>
+                    </div>
+
+                    <div class="grid-box triple-width" style="min-height: 100px;">
+                        <div class="box-header label-prod-notes">Production Notes (Underline)</div>
+                        <textarea id="box-prod-notes" class="textarea-box" placeholder="Catering schedules, weather flags, general logs..."></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+<script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+        const dbName = "InvincBreakdownStudioDB";
+        const storeName = "breakdownWorkspace";
+        let db;
+
+        // DB Initialization Pipeline
+        const request = indexedDB.open(dbName, 1);
+        request.onupgradeneeded = e => {
+            let database = e.target.result;
+            if (!database.objectStoreNames.contains(storeName)) {
+                database.createObjectStore(storeName, { keyPath: "id" });
+            }
+        };
+        request.onsuccess = e => {
+            db = e.target.result;
+            loadWorkspaceState();
+        };
+
+        const pdfFileInput = document.getElementById('pdfFileInput');
+        const uploadPromptBox = document.getElementById('uploadPromptBox');
+        const pdfCanvasContainer = document.getElementById('pdfCanvasContainer');
+        const pdfNameDisplay = document.getElementById('pdfNameDisplay');
+        const clearPdfBtn = document.getElementById('clearPdfBtn');
+
+        /* --- PDF Document Ingest Operations --- */
+        pdfFileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file && file.type === "application/pdf") {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    const arrayBuffer = evt.target.result;
+                    saveDataToDB("cachedScriptPdf", { name: file.name, buffer: arrayBuffer });
+                    renderPdfInline(arrayBuffer, file.name);
+                };
+                reader.readAsArrayBuffer(file);
+            }
+        });
+
+        async function renderPdfInline(arrayBuffer, fileName) {
+            pdfCanvasContainer.innerHTML = "";
+            pdfNameDisplay.textContent = fileName;
+            uploadPromptBox.style.display = 'none';
+            clearPdfBtn.style.display = 'block';
+            pdfCanvasContainer.style.display = 'flex';
+
+            try {
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+                    const page = await pdf.getPage(pageNum);
+                    const viewport = page.getViewport({ scale: 1.2 });
+                    
+                    const pageWrapper = document.createElement('div');
+                    pageWrapper.className = 'pdf-page-wrapper';
+                    
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+                    
+                    pageWrapper.appendChild(canvas);
+                    pdfCanvasContainer.appendChild(pageWrapper);
+                    await page.render({ canvasContext: context, viewport: viewport }).promise;
+                }
+            } catch (err) {
+                console.error("PDF engine error:", err);
+            }
+        }
+
+        clearPdfBtn.addEventListener('click', () => {
+            deleteDataFromDB("cachedScriptPdf");
+            pdfCanvasContainer.innerHTML = "";
+            pdfFileInput.value = "";
+            pdfNameDisplay.textContent = "Script Engine Viewer";
+            clearPdfBtn.style.display = 'none';
+            pdfCanvasContainer.style.display = 'none';
+            uploadPromptBox.style.display = 'flex';
+        });
+
+        /* --- Form Storage Persistence Tracking Engine --- */
+        const formIds = [
+            "meta-sheet-num", "meta-page-count", "meta-date", "meta-prod-co", "meta-project-title",
+            "meta-scene-num", "meta-scene-name", "meta-ie", "meta-dn", "meta-script-page", 
+            "meta-loc-name", "meta-description", "box-cast", "box-stunts", "box-extras-atm", 
+            "box-sfx", "box-props", "box-extras-sil", "box-wardrobe", "box-makeup", "box-vehicles", 
+            "box-special-equip", "box-music", "box-prod-notes"
+        ];
+
+        function autoSaveFormGridState() {
+            if (!db) return;
+            const formDataMap = {};
+            formIds.forEach(id => {
+                formDataMap[id] = document.getElementById(id).value;
+            });
+            saveDataToDB("cachedFormFields", formDataMap);
+        }
+
+        // Bind auto-save handlers across all active input nodes
+        formIds.forEach(id => {
+            const el = document.getElementById(id);
+            const eventType = el.tagName === "TEXTAREA" ? "input" : "change";
+            el.addEventListener(eventType, autoSaveFormGridState);
+        });
+
+        function resetFormGrid() {
+            if (confirm("Reset current breakdown sheet fields clean?")) {
+                formIds.forEach(id => document.getElementById(id).value = "");
+                autoSaveFormGridState();
+            }
+        }
+
+        /* --- IndexedDB Core Operations Framework --- */
+        function saveDataToDB(key, val) {
+            if (!db) return;
+            db.transaction([storeName], "readwrite").objectStore(storeName).put({ id: key, payload: val });
+        }
+
+        function deleteDataFromDB(key) {
+            if (!db) return;
+            db.transaction([storeName], "readwrite").objectStore(storeName).delete(key);
+        }
+
+        function loadWorkspaceState() {
+            const store = db.transaction([storeName], "readonly").objectStore(storeName);
+
+            // Fetch Script Viewport binary
+            const pdfReq = store.get("cachedScriptPdf");
+            pdfReq.onsuccess = () => {
+                if (pdfReq.result) renderPdfInline(pdfReq.result.payload.buffer, pdfReq.result.payload.name);
+            };
+
+            // Populate Breakdown Grid inputs
+            const formReq = store.get("cachedFormFields");
+            formReq.onsuccess = () => {
+                if (formReq.result) {
+                    const data = formReq.result.payload;
+                    formIds.forEach(id => {
+                        if (data[id] !== undefined) document.getElementById(id).value = data[id];
+                    });
+                }
+            };
+        }
+
+        /* --- PDF Document Export Generation Engine --- */
+        function exportBreakdownPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+            
+            const getVal = id => document.getElementById(id).value || '';
+
+            // Clean Minimalistic Header Block Setup
+            doc.setFillColor(240, 240, 240);
+            doc.rect(10, 10, 190, 8, 'F');
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(11);
+            doc.text(`BREAKDOWN SHEET #: ${getVal('meta-sheet-num')}`, 14, 15.5);
+            doc.text(`PAGE COUNT: ${getVal('meta-page-count')}`, 85, 15.5);
+            doc.text(`DATE: ${getVal('meta-date')}`, 155, 15.5);
+
+            // Production block text data boxes
+            doc.setLineWidth(0.2);
+            doc.setDrawColor(180, 180, 180);
+            doc.rect(10, 20, 190, 14);
+            doc.setFontSize(9);
+            doc.setFont("helvetica", "normal");
+            doc.text(`PROD. COMPANY:  ${getVal('meta-prod-co')}`, 14, 25);
+            doc.text(`PROJECT TITLE:   ${getVal('meta-project-title')}`, 14, 31);
+
+            // Technical details scene row blocks
+            doc.rect(10, 36, 190, 10);
+            doc.text(`SCENE #: ${getVal('meta-scene-num')}`, 14, 42);
+            doc.text(`SCENE NAME: ${getVal('meta-scene-name')}`, 50, 42);
+            doc.text(`INT/EXT: ${getVal('meta-ie')}`, 135, 42);
+            doc.text(`D/N: ${getVal('meta-dn')}`, 175, 42);
+
+            // Script mapping blocks
+            doc.rect(10, 48, 190, 10);
+            doc.text(`SCRIPT PAGE: ${getVal('meta-script-page')}`, 14, 54);
+            doc.text(`LOCATION NAME: ${getVal('meta-loc-name')}`, 100, 54);
+
+            // Brief Description summary box block
+            doc.rect(10, 60, 190, 12);
+            doc.setFont("helvetica", "bold");
+            doc.text("DESCRIPTION:", 14, 65);
+            doc.setFont("helvetica", "normal");
+            doc.text(getVal('meta-description'), 42, 65, { maxWidth: 155 });
+
+            // Table matrix structures compilation mapping metrics
+            const bodyData = [
+                [{v: getVal('box-cast'), t: 'CAST (Red)'}, {v: getVal('box-stunts'), t: 'STUNTS (Orange)'}, {v: getVal('box-extras-atm'), t: 'EXTRAS/ATMOSPHERE (Green)'}],
+                [{v: getVal('box-sfx'), t: 'SPECIAL EFFECTS (Blue)'}, {v: getVal('box-props'), t: 'PROPS (Purple)'}, {v: getVal('box-extras-sil'), t: 'EXTRAS/SILENT (Yellow)'}],
+                [{v: getVal('box-wardrobe'), t: 'WARDROBE (Circle)'}, {v: getVal('box-makeup'), t: 'MAKEUP/HAIR (*)'}, {v: getVal('box-vehicles'), t: 'VEHICLE / ANIMALS (Pink)'}],
+                [{v: getVal('box-special-equip'), t: 'SPECIAL EQUIPMENT (Box)'}, {v: getVal('box-music'), t: 'SOUND EFFECTS & MUSIC (Brown)'}, {v: '', t: ''}]
+            ];
+
+            let activeY = 76;
+            bodyData.forEach(row => {
+                let maxBoxHeight = 32;
+                
+                for(let i=0; i<3; i++) {
+                    let colX = 10 + (i * 63.33);
+                    if(row[i].t === '' && i === 2) continue; // Skip final spacer block boundary
+                    
+                    let targetW = (row[i].t === 'SOUND EFFECTS & MUSIC (Brown)' && i === 1) ? 126.66 : 63.33;
+
+                    doc.rect(colX, activeY, targetW, maxBoxHeight);
+                    doc.setFillColor(248, 248, 248);
+                    doc.rect(colX + 0.2, activeY + 0.2, targetW - 0.4, 5, 'F');
+                    
+                    doc.setFont("helvetica", "bold");
+                    doc.setFontSize(7);
+                    doc.text(row[i].t, colX + 3, activeY + 4);
+                    
+                    doc.setFont("helvetica", "normal");
+                    doc.setFontSize(8);
+                    doc.text(row[i].v, colX + 3, activeY + 9, { maxWidth: targetW - 6 });
+                }
+                activeY += maxBoxHeight + 4;
+            });
+
+            // Production logs footer notes container block layout
+            doc.rect(10, activeY, 190, 24);
+            doc.setFillColor(248, 248, 248);
+            doc.rect(10 + 0.2, activeY + 0.2, 190 - 0.4, 5, 'F');
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(7);
+            doc.text("PRODUCTION NOTES (Underline)", 14, activeY + 4);
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(8);
+            doc.text(getVal('box-prod-notes'), 14, activeY + 9, { maxWidth: 182 });
+
+            const sceneNameFormatted = getVal('meta-scene-name').replace(/\s+/g, '_') || 'Scene';
+            doc.save(`Breakdown_Sheet_${getVal('meta-sheet-num')}_${sceneNameFormatted}.pdf`);
+        }
+    </script>
+</body>
+</html>
+         

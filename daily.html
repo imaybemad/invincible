@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invincible Studio - Production Report</title>
+    <style>
+        /* --- NETFLIX DARK THEME UI STYLES --- */
+        :root {
+            --bg-color: #141414;
+            --card-bg: #1f1f1f;
+            --accent-red: #E50914;
+            --text-color: #F5F5F7;
+            --text-muted: #808080;
+            --border-color: #333333;
+            --input-bg: #2b2b2b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding-bottom: 60px;
+        }
+
+        /* Navbar Layout */
+        .navbar {
+            background-color: #000000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 4%;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 2px solid var(--accent-red);
+        }
+
+        .navbar-brand img {
+            height: 35px;
+            vertical-align: middle;
+        }
+
+        .navbar-nav {
+            list-style: none;
+            display: flex;
+            gap: 25px;
+        }
+
+        .navbar-nav a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .navbar-nav a:hover {
+            color: var(--accent-red);
+        }
+
+        /* Workspace Controls Toolbar */
+        .manager-bar {
+            max-width: 1000px;
+            margin: 20px auto;
+            background: var(--card-bg);
+            padding: 15px 20px;
+            border-radius: 6px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid var(--border-color);
+        }
+
+        .manager-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .manager-bar label {
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--text-muted);
+        }
+
+        select, input[type="text"].nav-input {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 8px 12px;
+            border-radius: 4px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        button {
+            background-color: var(--accent-red);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        button:hover {
+            background-color: #b80710;
+        }
+        
+        button:active {
+            transform: scale(0.98);
+        }
+
+        button.btn-secondary {
+            background-color: #444;
+        }
+        button.btn-secondary:hover {
+            background-color: #555;
+        }
+
+        /* --- PRODUCTION REPORT SHEET CONTAINER --- */
+        .document-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            color: var(--text-color);
+            padding: 50px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Dynamic Header Block to Mirror 1000055505.png */
+        .doc-header-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+
+        .doc-header-table td {
+            border: none !important;
+            padding: 0;
+            vertical-align: top;
+        }
+
+        .company-meta-box {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .company-meta-box input {
+            display: block;
+            font-size: 12px;
+            color: var(--text-color);
+            border: none;
+            background: transparent;
+            outline: none;
+            margin-bottom: 2px;
+            width: 100%;
+        }
+
+        .title-meta-box {
+            text-align: center;
+        }
+
+        .title-meta-box h1 {
+            font-size: 32px;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+            color: var(--text-color);
+        }
+
+        .title-meta-box input.project-name-input {
+            font-size: 20px;
+            font-style: italic;
+            text-align: center;
+            border: none;
+            background: transparent;
+            color: var(--accent-red);
+            width: 100%;
+            outline: none;
+            margin-top: 4px;
+        }
+
+        .title-meta-box input.date-sub-input {
+            font-size: 13px;
+            text-align: center;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            width: 100%;
+            outline: none;
+            margin-top: 4px;
+        }
+
+        .timeline-meta-box {
+            text-align: right;
+            font-size: 13px;
+        }
+
+        .timeline-meta-box .day-tracker {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .timeline-meta-box .day-tracker input {
+            font-size: 18px;
+            font-weight: bold;
+            text-align: right;
+            border: none;
+            background: transparent;
+            color: var(--text-color);
+            width: 120px;
+            outline: none;
+        }
+
+        .date-row-item {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-bottom: 4px;
+            gap: 6px;
+        }
+
+        .date-row-item label {
+            font-weight: bold;
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .date-row-item input {
+            border: none;
+            background: var(--input-bg);
+            color: var(--text-color);
+            padding: 3px 6px;
+            font-size: 12px;
+            width: 130px;
+            border-radius: 4px;
+            text-align: right;
+            outline: none;
+        }
+
+        /* Data Section Labels */
+        .section-label {
+            font-size: 14px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-top: 25px;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+            color: var(--text-color);
+        }
+
+        /* Structural Framework Tables */
+        .report-grid-table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+            margin-bottom: 15px;
+        }
+
+        .report-grid-table th {
+            background-color: #050505;
+            color: var(--text-color);
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            text-align: left;
+            letter-spacing: 0.5px;
+        }
+
+        .report-grid-table td {
+            border: 1px solid var(--border-color);
+            padding: 0;
+            vertical-align: middle;
+            background-color: rgba(255, 255, 255, 0.01);
+        }
+
+        .report-grid-table td.label-cell {
+            background-color: #0b0b0b;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+            padding: 8px;
+            color: var(--text-muted);
+            width: 180px;
+        }
+
+        .report-grid-table input[type="text"] {
+            width: 100%;
+            border: none;
+            background: transparent;
+            padding: 8px;
+            font-size: 13px;
+            color: var(--text-color);
+            outline: none;
+        }
+
+        /* Equipment / Tech Notes Block */
+        .tech-notes-block {
+            border: 1px solid var(--border-color);
+            background-color: rgba(255, 255, 255, 0.01);
+        }
+
+        .tech-notes-header {
+            background-color: #0b0b0b;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+            padding: 8px;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
+            letter-spacing: 0.5px;
+        }
+
+        .tech-notes-block textarea {
+            width: 100%;
+            height: 100px;
+            background: transparent;
+            border: none;
+            resize: none;
+            outline: none;
+            color: var(--text-color);
+            font-size: 13px;
+            padding: 10px;
+            font-family: inherit;
+            line-height: 1.5;
+        }
+
+        /* Footer Stamp */
+        .page-num-stamp {
+            text-align: right;
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 15px;
+        }
+
+        /* --- COMPREHENSIVE VECTOR PRINT ENGINE --- */
+        @media print {
+            @page {
+                size: letter portrait;
+                margin: 0.4in 0.4in 0.5in 0.4in;
+            }
+            body {
+                background: #ffffff !important;
+                color: #000000 !important;
+                padding-bottom: 0;
+            }
+            .navbar, .manager-bar, button {
+                display: none !important;
+            }
+            
+            /* Flip layout attributes to absolute light sheet aesthetics */
+            .document-container {
+                max-width: 100%;
+                box-shadow: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                background: #ffffff !important;
+                color: #000000 !important;
+                border: none !important;
+            }
+            .title-meta-box h1 {
+                color: #000000 !important;
+            }
+            .title-meta-box input.project-name-input {
+                color: #222222 !important;
+            }
+            .company-meta-box, .title-meta-box input.date-sub-input, .timeline-meta-box, .date-row-item label {
+                color: #333333 !important;
+            }
+            .company-meta-box input, .timeline-meta-box .day-tracker input {
+                color: #000000 !important;
+            }
+            .date-row-item input {
+                background: transparent !important;
+                color: #000000 !important;
+                border: none !important;
+                padding: 0 !important;
+                width: auto !important;
+            }
+            .section-label {
+                color: #000000 !important;
+            }
+            .report-grid-table th {
+                background-color: #e6e6e6 !important;
+                color: #000000 !important;
+                border: 1px solid #777777 !important;
+            }
+            .report-grid-table td {
+                border: 1px solid #777777 !important;
+                background-color: #ffffff !important;
+            }
+            .report-grid-table td.label-cell, .tech-notes-header {
+                background-color: #f2f2f2 !important;
+                color: #111111 !important;
+                border: 1px solid #777777 !important;
+            }
+            .report-grid-table input[type="text"], .tech-notes-block textarea {
+                color: #000000 !important;
+            }
+            .tech-notes-block {
+                border: 1px solid #777777 !important;
+            }
+            .page-num-stamp {
+                color: #555555 !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVIGATION BAR -->
+    <nav class="navbar">
+        <a class="navbar-brand" href="index.html">
+            <img src="Invinc.png" alt="Invincible Studio Logo">
+        </a>
+        <ul class="navbar-nav">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="production.html">Back</a></li>
+        </ul>
+    </nav>
+
+    <!-- STORAGE MANAGEMENT SYSTEM TOOLBAR -->
+    <div class="manager-bar">
+        <div class="manager-group">
+            <label for="report-selector">Saved Reports:</label>
+            <select id="report-selector" onchange="loadReport()">
+                <option value="default">-- Create Blank Report --</option>
+            </select>
+            <button class="btn-secondary" onclick="deleteReportProfile()">Delete Report</button>
+        </div>
+        <div class="manager-group">
+            <input type="text" id="save-profile-input" class="nav-input" placeholder="Roster Name/Day...">
+            <button onclick="saveReport()">Save Report</button>
+            <button onclick="window.print()">Export Report PDF</button>
+        </div>
+    </div>
+
+    <!-- DOCUMENT PACK CONTAINER -->
+    <div class="document-container">
+        
+        <!-- TOP METADATA ROW HEADER SPLIT -->
+        <table class="doc-header-table">
+            <tr>
+                <!-- Box 1: Production Company Identification -->
+                <td style="width: 33.33%;">
+                    <div class="company-meta-box">
+                        <input type="text" data-rep="comp_name" placeholder="Production Company Name">
+                        <input type="text" data-rep="comp_addr" placeholder="123 Evergreen Terrace, #126">
+                        <input type="text" data-rep="comp_city" placeholder="Beverly Hills, CA 90210">
+                        <input type="text" data-rep="comp_phone" placeholder="P: (555) 555-5555">
+                        <input type="text" data-rep="comp_fax" placeholder="F: (555) 555-5555">
+                    </div>
+                </td>
+                <!-- Box 2: Central Report Titles -->
+                <td style="width: 33.33%;">
+                    <div class="title-meta-box">
+                        <h1>Production Report</h1>
+                        <input type="text" class="project-name-input" data-rep="title_project_name" placeholder="Your Project Name">
+                        <input type="text" class="date-sub-input" data-rep="title_sub_date" placeholder="December 16, 2016">
+                    </div>
+                </td>
+                <!-- Box 3: Timeline & Bounds Tracking -->
+                <td style="width: 33.33%;">
+                    <div class="timeline-meta-box">
+                        <div class="day-tracker">
+                            <span>Day</span> <input type="text" data-rep="timeline_day_tracker" placeholder="1 of 5">
+                        </div>
+                        <div class="date-row-item">
+                            <label>Start Date:</label>
+                            <input type="text" data-rep="timeline_start_date" placeholder="December 16, 2016">
+                        </div>
+                        <div class="date-row-item">
+                            <label>End Date:</label>
+                            <input type="text" data-rep="timeline_end_date" placeholder="December 21, 2016">
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+     <!-- SECTION 1: TIMES -->
+        <div class="section-label">Times:</div>
+        <table class="report-grid-table">
+            <tr>
+                <td class="label-cell">Crew Call:</td>
+                <td><input type="text" data-rep="time_crew_call"></td>
+                <td class="label-cell">Meal 2 / Break In:</td>
+                <td><input type="text" data-rep="time_meal2_in"></td>
+            </tr>
+            <tr>
+                <td class="label-cell">Shoot Call:</td>
+                <td><input type="text" data-rep="time_shoot_call"></td>
+                <td class="label-cell">Meal 2 / Break Out:</td>
+                <td><input type="text" data-rep="time_meal2_out"></td>
+            </tr>
+            <tr>
+                <td class="label-cell">First Shot:</td>
+                <td><input type="text" data-rep="time_first_shot"></td>
+                <td class="label-cell">Camera Wrap:</td>
+                <td><input type="text" data-rep="time_cam_wrap"></td>
+            </tr>
+            <tr>
+                <td class="label-cell">Meal 1 In:</td>
+                <td><input type="text" data-rep="time_meal1_in"></td>
+                <td class="label-cell">Crew Wrap:</td>
+                <td><input type="text" data-rep="time_crew_wrap"></td>
+            </tr>
+            <tr>
+                <td class="label-cell">Meal 1 Out:</td>
+                <td><input type="text" data-rep="time_meal1_out"></td>
+                <td class="label-cell">Last Man:</td>
+                <td><input type="text" data-rep="time_last_man"></td>
+            </tr>
+        </table>
+
+        <!-- SECTION 2: LOCATIONS & LEAD PRODUCTION CREW SPLIT -->
+        <table class="report-grid-table">
+            <tr>
+                <th style="width: 50%;">Locations:</th>
+                <th style="width: 50%;">Lead Production Crew:</th>
+            </tr>
+            <tr>
+                <td>
+                    <div style="display:flex; align-items:center;">
+                        <span style="font-size:11px; font-weight:bold; padding-left:8px; color:var(--text-muted);">1.</span>
+                        <input type="text" data-rep="loc_1">
+                    </div>
+                </td>
+                <td>
+                    <div style="display:flex; align-items:center;">
+                        <span style="font-size:11px; font-weight:bold; padding-left:8px; width:160px; color:var(--text-muted); text-transform:uppercase;">Executive Producer:</span>
+                        <input type="text" data-rep="crew_ep">
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div style="display:flex; align-items:center;">
+                        <span style="font-size:11px; font-weight:bold; padding-left:8px; color:var(--text-muted);">2.</span>
+                        <input type="text" data-rep="loc_2">
+                    </div>
+                </td>
+                <td>
+                    <div style="display:flex; align-items:center;">
+                        <span style="font-size:11px; font-weight:bold; padding-left:8px; width:160px; color:var(--text-muted); text-transform:uppercase;">Producer:</span>
+                        <input type="text" data-rep="crew_producer">
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div style="display:flex; align-items:center;">
+                        <span style="font-size:11px; font-weight:bold; padding-left:8px; color:var(--text-muted);">3.</span>
+                        <input type="text" data-rep="loc_3">
+                    </div>
+                </td>
+                <td>
+                    <div style="display:flex; align-items:center;">
+                        <span style="font-size:11px; font-weight:bold; padding-left:8px; width:160px; color:var(--text-muted); text-transform:uppercase;">Director:</span>
+                        <input type="text" data-rep="crew_director">
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div style="display:flex; align-items:center;">
+                        <span style="font-size:11px; font-weight:bold; padding-left:8px; color:var(--text-muted);">4.</span>
+                        <input type="text" data-rep="loc_4">
+                    </div>
+                </td>
+                <td>
+                    <div style="display:flex; align-items:center;">
+                        <span style="font-size:11px; font-weight:bold; padding-left:8px; width:160px; color:var(--text-muted); text-transform:uppercase;">Production Manager:</span>
+                        <input type="text" data-rep="crew_pm">
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div style="display:flex; align-items:center;">
+                        <span style="font-size:11px; font-weight:bold; padding-left:8px; color:var(--text-muted);">5.</span>
+                        <input type="text" data-rep="loc_5">
+                    </div>
+                </td>
+                <td>
+                    <div style="display:flex; align-items:center;">
+                        <span style="font-size:11px; font-weight:bold; padding-left:8px; width:160px; color:var(--text-muted); text-transform:uppercase;">Production Coordinator:</span>
+                        <input type="text" data-rep="crew_pc">
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div style="display:flex; align-items:center;">
+                        <span style="font-size:11px; font-weight:bold; padding-left:8px; color:var(--text-muted);">6.</span>
+                        <input type="text" data-rep="loc_6">
+                    </div>
+                </td>
+                <td>
+                    <div style="display:flex; align-items:center;">
+                        <span style="font-size:11px; font-weight:bold; padding-left:8px; width:160px; color:var(--text-muted); text-transform:uppercase;">1st Assistant Director:</span>
+                        <input type="text" data-rep="crew_1ad">
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+        <!-- SECTION 3: MEDIA USAGE -->
+        <div class="section-label">Media Usage:</div>
+        <table class="report-grid-table">
+            <tr>
+                <td class="label-cell" style="width:220px;"># of Cards Used</td>
+                <td><input type="text" data-rep="media_cards_used"></td>
+            </tr>
+            <tr>
+                <td class="label-cell" style="width:220px;">Previously Shot (GB)</td>
+                <td><input type="text" data-rep="media_prev_shot"></td>
+            </tr>
+            <tr>
+                <td class="label-cell" style="width:220px;">Shot Today (GB)</td>
+                <td><input type="text" data-rep="media_shot_today"></td>
+            </tr>
+            <tr>
+                <td class="label-cell" style="width:220px;">Total to Date (GB)</td>
+                <td><input type="text" data-rep="media_total_to_date"></td>
+            </tr>
+        </table>
+
+        <!-- SECTION 4: CARD OVERVIEW LEDGER GRID -->
+        <table class="report-grid-table" style="margin-top:20px;">
+            <thead>
+                <tr>
+                    <th style="width: 15%; text-align:center;">Card Number</th>
+                    <th style="width: 45%;">Footage Description</th>
+                    <th style="width: 40%;">Audio Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><input type="text" style="text-align:center;" data-rep="card_num_1"></td>
+                    <td><input type="text" data-rep="card_desc_1"></td>
+                    <td><input type="text" data-rep="card_audio_1"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" style="text-align:center;" data-rep="card_num_2"></td>
+                    <td><input type="text" data-rep="card_desc_2"></td>
+                    <td><input type="text" data-rep="card_audio_2"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" style="text-align:center;" data-rep="card_num_3"></td>
+                    <td><input type="text" data-rep="card_desc_3"></td>
+                    <td><input type="text" data-rep="card_audio_3"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" style="text-align:center;" data-rep="card_num_4"></td>
+                    <td><input type="text" data-rep="card_desc_4"></td>
+                    <td><input type="text" data-rep="card_audio_4"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" style="text-align:center;" data-rep="card_num_5"></td>
+                    <td><input type="text" data-rep="card_desc_5"></td>
+                    <td><input type="text" data-rep="card_audio_5"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- SECTION 5: EQUIPMENT / TECH NOTES -->
+        <div class="tech-notes-block" style="margin-top:20px;">
+            <div class="tech-notes-header">Equipment / Tech Notes:</div>
+            <textarea id="tech-notes-area" data-rep="textarea_tech_notes" placeholder="Enter camera lens breakdowns, audio tracking updates, hardware exceptions, or grip packages notes here..."></textarea>
+        </div>
+
+        <!-- FOOTER SHEET LABELS -->
+        <div class="page-num-stamp">1 of 4</div>
+
+    </div>
+
+    <!-- UTILITY CONTROL STORAGE MOTOR LOGIC -->
+    <script>
+        window.onload = function() {
+            clearReportCanvas();
+            refreshProfileSelector();
+        };
+
+        function clearReportCanvas() {
+            document.querySelectorAll('[data-rep]').forEach(input => input.value = '');
+        }
+
+        /* --- STABLE DATABASE PERSISTENCE LAYER --- */
+        function getStorageDatabase() {
+            const rawData = localStorage.getItem('invincible_daily_reports_v1');
+            return rawData ? JSON.parse(rawData) : {};
+        }
+
+        function refreshProfileSelector() {
+            const selector = document.getElementById('report-selector');
+            const database = getStorageDatabase();
+
+            selector.innerHTML = '<option value="default">-- Create Blank Report --</option>';
+            Object.keys(database).forEach(key => {
+                const option = document.createElement('option');
+                option.value = key;
+                option.textContent = key;
+                selector.appendChild(option);
+            });
+        }
+
+        function saveReport() {
+            const profileName = document.getElementById('save-profile-input').value.trim();
+            if (!profileName) {
+                alert("Please declare a unique reference profile configuration name to save this dataset.");
+                return;
+            }
+
+            const activeDataset = {};
+            document.querySelectorAll('[data-rep]').forEach(input => {
+                activeDataset[input.getAttribute('data-rep')] = input.value;
+            });
+
+            const database = getStorageDatabase();
+            database[profileName] = activeDataset;
+            localStorage.setItem('invincible_daily_reports_v1', JSON.stringify(database));
+
+            refreshProfileSelector();
+            document.getElementById('report-selector').value = profileName;
+            alert(`"${profileName}" compiled successfully to secure local application memory cache.`);
+        }
+
+        function loadReport() {
+            const targetKey = document.getElementById('report-selector').value;
+            if (targetKey === 'default') {
+                clearReportCanvas();
+                document.getElementById('save-profile-input').value = '';
+                return;
+            }
+
+            const database = getStorageDatabase();
+            const config = database[targetKey];
+            if (!config) return;
+
+            document.getElementById('save-profile-input').value = targetKey;
+
+            Object.keys(config).forEach(key => {
+                const targetNode = document.querySelector(`[data-rep="${key}"]`);
+                if (targetNode) targetNode.value = config[key];
+            });
+        }
+
+        function deleteReportProfile() {
+            const activeProfile = document.getElementById('report-selector').value;
+            if (activeProfile === 'default') return;
+
+            if (confirm(`Permanently delete stored document dataset mapping variables for: "${activeProfile}"?`)) {
+                const database = getStorageDatabase();
+                delete database[activeProfile];
+                localStorage.setItem('invincible_daily_reports_v1', JSON.stringify(database));
+
+                document.getElementById('save-profile-input').value = '';
+                refreshProfileSelector();
+                clearReportCanvas();
+            }
+        }
+    </script>
+</body>
+</html>
